@@ -9,14 +9,14 @@ authors = [
 ]
 description = "The simple yet powerful system for changing utility devices."
 readme = "README.rst"
-license = { file="LICENSE" }
+license = 'GPL-3.0-or-later'
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
 classifiers = [
     "Development Status :: 1 - Planning",
     "Environment :: Web Environment",
     "Intended Audience :: End Users/Desktop",
     "Intended Audience :: Other Audience",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Natural Language :: English",
     "Natural Language :: Swedish",
     "Operating System :: OS Independent",
