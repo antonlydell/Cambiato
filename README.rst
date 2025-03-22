@@ -31,16 +31,16 @@ Cambiato is distributed under the `GNU General Public License v3`_.
 .. _GNU General Public License v3: https://www.gnu.org/licenses/gpl-3.0-standalone.html
 
 
-.. |LICENSE| image:: https://img.shields.io/pypi/l/cambiato?style=plastic
+.. |LICENSE| image:: https://img.shields.io/pypi/l/Cambiato?style=plastic
    :alt: PyPI - License
-   :target: https://github.com/antonlydell/cambiato/blob/main/LICENSE
+   :target: https://github.com/antonlydell/Cambiato/blob/main/LICENSE
 
 
-.. |PyPI| image:: https://img.shields.io/pypi/v/cambiato?style=plastic
+.. |PyPI| image:: https://img.shields.io/pypi/v/Cambiato?style=plastic
    :alt: PyPI
-   :target: https://pypi.org/project/cambiato/
+   :target: https://pypi.org/project/Cambiato/
 
 
-.. |Python| image:: https://img.shields.io/pypi/pyversions/cambiato?style=plastic
+.. |Python| image:: https://img.shields.io/pypi/pyversions/Cambiato?style=plastic
    :alt: PyPI - Python Version
-   :target: https://pypi.org/project/cambiato/
+   :target: https://pypi.org/project/Cambiato/
