@@ -9,8 +9,7 @@ authors = [
 ]
 description = "The simple yet powerful system for changing utility devices."
 readme = "README.rst"
-license = 'GPL-3.0-or-later'
-license-files = ["LICENSE"]
+license = { text = "GNU General Public License v3 (GPLv3)" }
 requires-python = ">=3.11"
 classifiers = [
     "Development Status :: 1 - Planning",
