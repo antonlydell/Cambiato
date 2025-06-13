@@ -5,7 +5,24 @@ devices such as district heating and electricity meters.
 """
 
 # Local
+from cambiato import database as db
 from cambiato.app import APP_PATH
+from cambiato.config import (
+    CONFIG_DIR,
+    CONFIG_FILE_ENV_VAR,
+    CONFIG_FILE_PATH,
+    CONFIG_FILENAME,
+    PROG_NAME,
+    ConfigManager,
+    DatabaseConfig,
+    load_config,
+)
+from cambiato.exceptions import (
+    CambiatoError,
+    ConfigError,
+    ConfigFileNotFoundError,
+    ParseConfigError,
+)
 from cambiato.metadata import (
     __releasedate__,
     __version__,
@@ -20,4 +37,20 @@ __all__ = [
     '__releasedate__',
     '__version__',
     '__versiontuple__',
+    # config
+    'CONFIG_DIR',
+    'CONFIG_FILE_ENV_VAR',
+    'CONFIG_FILE_PATH',
+    'CONFIG_FILENAME',
+    'PROG_NAME',
+    'ConfigManager',
+    'DatabaseConfig',
+    'load_config',
+    # database
+    'db',
+    # exceptions
+    'CambiatoError',
+    'ConfigError',
+    'ConfigFileNotFoundError',
+    'ParseConfigError',
 ]

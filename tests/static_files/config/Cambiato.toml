@@ -1,0 +1,11 @@
+[database]
+url = ':url'
+autoflush = false
+expire_on_commit = true
+create_database = true
+
+[database.connect_args]
+timeout = 30
+
+[database.engine_config]
+echo = true
