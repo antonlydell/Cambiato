@@ -209,6 +209,41 @@ class TestLoadConfig:
         # ===========================================================
 
     @pytest.mark.usefixtures('remove_config_file_env_var')
+    def test_load_default_config(self) -> None:
+        r"""Test to load the default configuration.
+
+        No config sources exist and the default config should be loaded.
+        """
+
+        # Setup
+        # ===========================================================
+        exp_result: ConfigDict = {
+            'config_file_path': None,
+            'database': {
+                'url': tuple(make_url('sqlite:///Cambiato.db')),
+                'autoflush': False,
+                'expire_on_commit': False,
+                'create_database': True,
+                'connect_args': {},
+                'engine_config': {},
+            },
+        }
+
+        # Exercise
+        # ===========================================================
+        cm = load_config()
+
+        # Verify
+        # ===========================================================
+        print(f'result\n{cm}\n')
+        print(f'exp_result\n{exp_result}')
+
+        assert cm.model_dump() == exp_result
+
+        # Clean up - None
+        # ===========================================================
+
+    @pytest.mark.usefixtures('remove_config_file_env_var')
     def test_load_from_default_location(
         self, config_file_from_default_location: tuple[Path, str, dict[str, Any]]
     ) -> None:

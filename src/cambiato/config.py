@@ -97,9 +97,10 @@ class ConfigManager(BaseConfigModel):
 
     Parameters
     ----------
-    config_file_path : Path
+    config_file_path : Path or None, default None
         The path to the config file from which the configuration was loaded.
         The special path '-' specifies that the config was loaded from stdin.
+        If None the default configuration was loaded.
 
     database : cambiato.DatabaseConfig
         The database configuration.
@@ -107,7 +108,7 @@ class ConfigManager(BaseConfigModel):
 
     model_config = ConfigDict(frozen=True)
 
-    config_file_path: Path
+    config_file_path: Path | None = None
     database: DatabaseConfig = Field(default_factory=DatabaseConfig)
 
 
@@ -125,12 +126,15 @@ def load_config(path: Path | None = None) -> ConfigManager:
 
     4. From the default config file location "~/.config/Cambiato/Cambiato.toml".
 
+    5. If none of the above the default configuration will be loaded.
+
     Parameters
     ----------
     path : pathlib.Path or None, default None
         The path to the config file. Specify `Path('-')` for stdin. If None the configuration
         will be loaded from the config file environment variable "CAMBIATO_CONFIG_FILE" if it
         exists otherwise from the default config file at "~/.config/Cambiato/Cambiato.toml".
+        If none of these sources exist the default configuration will be loaded.
 
     Returns
     -------
@@ -166,7 +170,12 @@ def load_config(path: Path | None = None) -> ConfigManager:
             error_msg = f'The config file "{file_path}" must be a file not a directory!'
             raise exceptions.ConfigFileNotFoundError(message=error_msg, data=file_path)
 
-        if not file_path.exists():
+        if file_path == CONFIG_FILE_PATH:
+            if file_path.exists():
+                config_content = file_path.read_text()
+            else:
+                config_content = None
+        elif not file_path.exists():
             error_msg = f'The config file "{file_path}" does not exist!'
             raise exceptions.ConfigFileNotFoundError(message=error_msg, data=file_path)
         else:
@@ -175,10 +184,15 @@ def load_config(path: Path | None = None) -> ConfigManager:
         file_path_str = '-'
         config_content = sys.stdin.read()
 
+    if not config_content:
+        return ConfigManager(config_file_path=None)
+
     config_content = f"config_file_path = '{file_path_str}'\n{config_content}"
 
     try:
-        return ConfigManager.model_validate(tomllib.loads(config_content))
+        config_from_toml = tomllib.loads(config_content)
     except (tomllib.TOMLDecodeError, TypeError) as e:
         error_msg = f'Syntax error in config : {e.args[0]}'
         raise exceptions.ParseConfigError(error_msg) from None
+
+    return ConfigManager.model_validate(config_from_toml)
