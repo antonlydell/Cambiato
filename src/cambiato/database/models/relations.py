@@ -82,7 +82,7 @@ class Location(ModifiedAndCreatedColumnMixin, Base):
 
     Parameters
     ----------
-    location_id : str
+    location_id : int
         The unique ID of the location. The primary key of the table.
 
     ext_id : str or None
@@ -202,7 +202,7 @@ class Location(ModifiedAndCreatedColumnMixin, Base):
     country: Mapped[str | None]
 
     location_type: Mapped[LocationType] = relationship(back_populates='locations')
-    coordinate_system: Mapped[CoordinateSystem] = relationship(back_populates='locations')
+    coordinate_system: Mapped[CoordinateSystem] = relationship()
 
 
 Index(f'{Location.__tablename__}_ext_id_uix', Location.ext_id, unique=True)
@@ -978,7 +978,7 @@ class Facility(ModifiedAndCreatedColumnMixin, Base):
 
     Parameters
     ----------
-    facility_id : str
+    facility_id : int
         The unique ID of the facility. The primary key of the table.
 
     customer_id : int or None
@@ -1256,14 +1256,14 @@ class DistrictHeatingCoolingFacility(ModifiedAndCreatedColumnMixin, Base):
 
     Parameters
     ----------
-    facility_id : str
+    facility_id : int
         The unique ID of the facility. The primary key of the table.
         Foreign key to :attr:`Facility.facility_id`.
 
     device_loc_build_length : int or None
         The build length [mm] where the volume pipe should be fitted to the device location.
 
-    device_loc_mount_type_id : str or None
+    device_loc_mount_type_id : int or None
         The mount type of the volume pipe to the device location.
         Foreign key to :attr:`MountType.mount_type_id`. Is indexed.
 
@@ -1322,7 +1322,7 @@ class ElectricityFacility(ModifiedAndCreatedColumnMixin, Base):
 
     Parameters
     ----------
-    facility_id : str
+    facility_id : int
         The unique ID of the facility. The primary key of the table.
         Foreign key to :attr:`Facility.facility_id`.
 
@@ -1507,6 +1507,7 @@ class Checklist(ModifiedAndCreatedColumnMixin, Base):
     description: Mapped[str | None]
 
     checklist_items: Mapped[list['ChecklistItem']] = relationship(back_populates='checklist')
+    orders: Mapped[list['Order']] = relationship(back_populates='checklist')
 
 
 Index(f'{Checklist.__tablename__}_utility_id_ix', Checklist.utility_id)
@@ -1524,11 +1525,11 @@ class ChecklistItem(ModifiedAndCreatedColumnMixin, Base):
         The checklist that the item belongs to. Foreign key to
         :attr:`Checklist.checklist_id`. Is indexed.
 
-    dtype_id : str
+    dtype_id : int
         The data type of the value that the checklist item can hold.
         Foreign key to :attr:`Dtype.dtype_id`. Is indexed.
 
-    value_column_name_id : str
+    value_column_name_id : int
         The column name where the checklist item value is stored, which depends of `dtype_id`.
         Foreign key to :attr:`ValueColumnName.value_column_name_id`. Is indexed.
 
@@ -1572,8 +1573,8 @@ class ChecklistItem(ModifiedAndCreatedColumnMixin, Base):
     checklist_id: Mapped[int] = mapped_column(
         ForeignKey(Checklist.checklist_id, ondelete='CASCADE')
     )
-    dtype_id: Mapped[str] = mapped_column(ForeignKey(DType.dtype_id))
-    value_column_name_id: Mapped[str] = mapped_column(
+    dtype_id: Mapped[int] = mapped_column(ForeignKey(DType.dtype_id))
+    value_column_name_id: Mapped[int] = mapped_column(
         ForeignKey(ValueColumnName.value_column_name_id)
     )
     name: Mapped[str]
@@ -1600,7 +1601,7 @@ class OrderType(ModifiedAndCreatedColumnMixin, Base):
 
     Parameters
     ----------
-    order_type_id : str
+    order_type_id : int
         The unique ID of the order type. The primary key of the table.
 
     utility_id : int
@@ -1707,7 +1708,7 @@ class Order(ModifiedAndCreatedColumnMixin, Base):
 
     Parameters
     ----------
-    order_id : str
+    order_id : int
         The unique ID of the order. The primary key of the table.
 
     order_type_id : int
@@ -1826,7 +1827,9 @@ class Order(ModifiedAndCreatedColumnMixin, Base):
         back_populates='order'
     )
     images: Mapped[list['Image']] = relationship(back_populates='order')
-    order_comments: Mapped[list['OrderComment']] = relationship(back_populates='order')
+    order_comments: Mapped[list['OrderComment']] = relationship(
+        back_populates='order', foreign_keys='OrderComment.order_id'
+    )
     order_schedules: Mapped[list['OrderScheduleLog']] = relationship(back_populates='order')
 
 
@@ -1927,7 +1930,7 @@ class OrderEnabledDisabledDevice(ModifiedAndCreatedColumnMixin, Base):
 
     Parameters
     ----------
-    order_id : str
+    order_id : int
         The ID of the order the device change belongs to. Part of primary key of the table.
         Foreign key to :attr:`Order.order_id`.
 
@@ -2234,7 +2237,7 @@ class OrderComment(ModifiedAndCreatedColumnMixin, Base):
         ForeignKey(Order.order_id, ondelete='SET NULL')
     )
 
-    order: Mapped[Order] = relationship(back_populates='order_comments')
+    order: Mapped[Order] = relationship(back_populates='order_comments', foreign_keys=[order_id])
 
 
 Index(f'{OrderComment.__tablename__}_order_id_ix', OrderComment.order_id)
@@ -2246,7 +2249,7 @@ class OrderScheduleLog(ModifiedAndCreatedColumnMixin, Base):
 
     Parameters
     ----------
-    order_id : str
+    order_id : int
         The unique ID of the order. Part of primary key of the table.
 
     user_id : str
