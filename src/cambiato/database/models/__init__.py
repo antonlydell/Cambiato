@@ -5,6 +5,7 @@ from .core import (
     SCHEMA,
     Base,
     CoordinateSystem,
+    DType,
     Key,
     KeyType,
     ManufactureBatch,
@@ -15,6 +16,7 @@ from .core import (
     Utility,
     ValueColumnName,
 )
+from .default import add_default_models_to_session
 from .relations import (
     Checklist,
     ChecklistItem,
@@ -56,6 +58,7 @@ __all__ = [
     'SCHEMA',
     'Base',
     'CoordinateSystem',
+    'DType',
     'Key',
     'KeyType',
     'ManufactureBatch',
@@ -65,6 +68,8 @@ __all__ = [
     'Unit',
     'Utility',
     'ValueColumnName',
+    # default
+    'add_default_models_to_session',
     # relations
     'Checklist',
     'ChecklistItem',
