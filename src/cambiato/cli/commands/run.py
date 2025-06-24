@@ -12,7 +12,10 @@ from typing import Iterable
 import click
 
 # Local
+from cambiato.app._pages.init import INIT_PATH
 from cambiato.app.main import APP_PATH
+
+streamlit_args_argument = click.argument('streamlit_args', nargs=-1, type=click.UNPROCESSED)
 
 
 def run_streamlit_app(path: Path | str, streamlit_args: Iterable[str]) -> None:
@@ -65,8 +68,16 @@ def run() -> None:
 
 
 @run.command(context_settings={'ignore_unknown_options': True})
-@click.argument('streamlit_args', nargs=-1, type=click.UNPROCESSED)
+@streamlit_args_argument
 def web(streamlit_args: tuple[str, ...]) -> None:
     """Run the Cambiato web app."""
 
     run_streamlit_app(path=APP_PATH, streamlit_args=streamlit_args)
+
+
+@run.command(context_settings={'ignore_unknown_options': True})
+@streamlit_args_argument
+def init(streamlit_args: tuple[str, ...]) -> None:
+    """Initialize the Cambiato database and create an admin user."""
+
+    run_streamlit_app(path=INIT_PATH, streamlit_args=streamlit_args)
