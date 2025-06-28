@@ -134,7 +134,8 @@ def load_config(path: Path | None = None) -> ConfigManager:
         The path to the config file. Specify `Path('-')` for stdin. If None the configuration
         will be loaded from the config file environment variable "CAMBIATO_CONFIG_FILE" if it
         exists otherwise from the default config file at "~/.config/Cambiato/Cambiato.toml".
-        If none of these sources exist the default configuration will be loaded.
+        If none of these sources exist the default configuration will be loaded unless config
+        exists in stdin, in which case the stdin configuration will be loaded.
 
     Returns
     -------
@@ -164,6 +165,9 @@ def load_config(path: Path | None = None) -> ConfigManager:
         else:
             file_path = path
 
+    config_content = None
+    file_path_str = ''
+
     if file_path:
         file_path_str = str(file_path)
         if file_path.is_dir():
@@ -180,9 +184,10 @@ def load_config(path: Path | None = None) -> ConfigManager:
             raise exceptions.ConfigFileNotFoundError(message=error_msg, data=file_path)
         else:
             config_content = file_path.read_text()
-    else:
-        file_path_str = '-'
+
+    if not config_content:
         config_content = sys.stdin.read()
+        file_path_str = '-' if config_content else file_path_str
 
     if not config_content:
         return ConfigManager(config_file_path=None)

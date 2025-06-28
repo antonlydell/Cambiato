@@ -180,6 +180,33 @@ class TestLoadConfig:
         # Clean up - None
         # ===========================================================
 
+    @pytest.mark.usefixtures('remove_config_file_env_var')
+    def test_path_is_none_and_config_in_stdin(
+        self, config_in_stdin: tuple[str, dict[str, Any], Path]
+    ) -> None:
+        r"""Test to not specify a config file path while config exists in stdin.
+
+        The config should be loaded from stdin.
+        """
+
+        # Setup
+        # ===========================================================
+        _, exp_result, _ = config_in_stdin
+
+        # Exercise
+        # ===========================================================
+        cm = load_config()
+
+        # Verify
+        # ===========================================================
+        print(f'result\n{cm}\n')
+        print(f'exp_result\n{exp_result}')
+
+        assert cm.model_dump() == exp_result
+
+        # Clean up - None
+        # ===========================================================
+
     @pytest.mark.usefixtures('config_file_from_default_location')
     def test_load_from_config_file_env_var(
         self, config_file_from_config_env_var: tuple[Path, str, dict[str, Any]]
@@ -208,7 +235,7 @@ class TestLoadConfig:
         # Clean up - None
         # ===========================================================
 
-    @pytest.mark.usefixtures('remove_config_file_env_var')
+    @pytest.mark.usefixtures('remove_config_file_env_var', 'empty_stdin')
     def test_load_default_config(self) -> None:
         r"""Test to load the default configuration.
 

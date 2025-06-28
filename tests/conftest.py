@@ -123,6 +123,13 @@ def config_in_stdin(
     return config_data_str, config_exp, db_path
 
 
+@pytest.fixture
+def empty_stdin(monkeypatch: pytest.MonkeyPatch) -> None:
+    r"""A mocked stdin that is empty."""
+
+    monkeypatch.setattr(cambiato.config.sys, 'stdin', io.StringIO(''))
+
+
 @pytest.fixture()
 def config_file_from_config_env_var(
     config_data: tuple[str, dict[str, Any], Path],
