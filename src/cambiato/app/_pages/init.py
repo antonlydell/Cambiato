@@ -52,11 +52,12 @@ def init_page() -> None:
         return
 
     cfg = cm.database
-    session_factory, _ = create_session_factory(
+    session_factory = create_session_factory(
         url=cfg.url,
         autoflush=cfg.autoflush,
         expire_on_commit=cfg.expire_on_commit,
         create_database=True,
+        connect_args=cfg.connect_args,
         **cfg.engine_config,
     )
 

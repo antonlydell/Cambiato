@@ -26,7 +26,7 @@ class TestInit:
         # ===========================================================
         db = tmp_path / 'Cambiato.db'
         url = f'sqlite:///{str(db)}'
-        session_factory, _ = create_session_factory(url=url, create_database=True)
+        session_factory = create_session_factory(url=url, create_database=True)
 
         get_tables_query = text("SELECT name FROM sqlite_master WHERE type = 'table'")
         tables_exp = set(
@@ -93,7 +93,7 @@ class TestInit:
 
         # Setup
         # ===========================================================
-        session_factory, _ = create_session_factory(url='sqlite://', create_database=True)
+        session_factory = create_session_factory(url='sqlite://', create_database=True)
 
         # Exercise
         # ===========================================================
