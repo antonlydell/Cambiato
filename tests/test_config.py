@@ -152,7 +152,7 @@ class TestLoadConfig:
         # ===========================================================
 
     @pytest.mark.usefixtures('config_file_from_config_env_var', 'config_file_from_default_location')
-    def test_load_from_stdin(self, config_in_stdin: tuple[str, dict[str, Any], Path]) -> None:
+    def test_load_from_stdin(self, config_in_stdin: tuple[str, dict[str, Any]]) -> None:
         r"""Test to load the config from stdin.
 
         The config is also present in:
@@ -164,7 +164,7 @@ class TestLoadConfig:
 
         # Setup
         # ===========================================================
-        _, exp_result, _ = config_in_stdin
+        _, exp_result = config_in_stdin
 
         # Exercise
         # ===========================================================
@@ -180,9 +180,11 @@ class TestLoadConfig:
         # Clean up - None
         # ===========================================================
 
-    @pytest.mark.usefixtures('remove_config_file_env_var')
+    @pytest.mark.usefixtures(
+        'remove_config_file_env_var', 'default_config_file_location_does_not_exist'
+    )
     def test_path_is_none_and_config_in_stdin(
-        self, config_in_stdin: tuple[str, dict[str, Any], Path]
+        self, config_in_stdin: tuple[str, dict[str, Any]]
     ) -> None:
         r"""Test to not specify a config file path while config exists in stdin.
 
@@ -191,7 +193,7 @@ class TestLoadConfig:
 
         # Setup
         # ===========================================================
-        _, exp_result, _ = config_in_stdin
+        _, exp_result = config_in_stdin
 
         # Exercise
         # ===========================================================
@@ -235,41 +237,6 @@ class TestLoadConfig:
         # Clean up - None
         # ===========================================================
 
-    @pytest.mark.usefixtures('remove_config_file_env_var', 'empty_stdin')
-    def test_load_default_config(self) -> None:
-        r"""Test to load the default configuration.
-
-        No config sources exist and the default config should be loaded.
-        """
-
-        # Setup
-        # ===========================================================
-        exp_result: ConfigDict = {
-            'config_file_path': None,
-            'database': {
-                'url': tuple(make_url('sqlite:///Cambiato.db')),
-                'autoflush': False,
-                'expire_on_commit': False,
-                'create_database': True,
-                'connect_args': {},
-                'engine_config': {},
-            },
-        }
-
-        # Exercise
-        # ===========================================================
-        cm = load_config()
-
-        # Verify
-        # ===========================================================
-        print(f'result\n{cm}\n')
-        print(f'exp_result\n{exp_result}')
-
-        assert cm.model_dump() == exp_result
-
-        # Clean up - None
-        # ===========================================================
-
     @pytest.mark.usefixtures('remove_config_file_env_var')
     def test_load_from_default_location(
         self, config_file_from_default_location: tuple[Path, str, dict[str, Any]]
@@ -293,6 +260,32 @@ class TestLoadConfig:
         print(f'exp_result\n{exp_result}')
 
         assert cm.model_dump() == exp_result
+
+        # Clean up - None
+        # ===========================================================
+
+    @pytest.mark.raises
+    @pytest.mark.usefixtures(
+        'remove_config_file_env_var', 'empty_stdin', 'default_config_file_location_does_not_exist'
+    )
+    def test_no_config_sources(self) -> None:
+        r"""Test to load the configuration when no config sources exist."""
+
+        # Setup
+        # ===========================================================
+        error_msg_exp = 'No configuration found! Check your sources!'
+
+        # Exercise
+        # ===========================================================
+        with pytest.raises(exceptions.ConfigError) as exc_info:
+            load_config()
+
+        # Verify
+        # ===========================================================
+        error_msg = exc_info.value.args[0]
+        print(error_msg)
+
+        assert error_msg_exp == error_msg
 
         # Clean up - None
         # ===========================================================
