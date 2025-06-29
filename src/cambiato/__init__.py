@@ -8,13 +8,16 @@ devices such as district heating and electricity meters.
 from cambiato import database as db
 from cambiato.app import APP_PATH
 from cambiato.config import (
+    BITWARDEN_PASSWORDLESS_API_URL,
     CONFIG_DIR,
     CONFIG_FILE_ENV_VAR,
     CONFIG_FILE_PATH,
     CONFIG_FILENAME,
     PROG_NAME,
+    BitwardenPasswordlessConfig,
     ConfigManager,
     DatabaseConfig,
+    Language,
     load_config,
 )
 from cambiato.exceptions import (
@@ -38,13 +41,16 @@ __all__ = [
     '__version__',
     '__versiontuple__',
     # config
+    'BITWARDEN_PASSWORDLESS_API_URL',
     'CONFIG_DIR',
     'CONFIG_FILE_ENV_VAR',
     'CONFIG_FILE_PATH',
     'CONFIG_FILENAME',
     'PROG_NAME',
+    'BitwardenPasswordlessConfig',
     'ConfigManager',
     'DatabaseConfig',
+    'Language',
     'load_config',
     # database
     'db',

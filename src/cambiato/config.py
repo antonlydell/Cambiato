@@ -5,12 +5,13 @@ import logging
 import os
 import sys
 import tomllib
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
 # Third party
 import streamlit_passwordless as stp
-from pydantic import ConfigDict, Field, field_validator
+from pydantic import AliasChoices, AnyHttpUrl, ConfigDict, Field, field_validator
 from sqlalchemy import URL
 
 # Local
@@ -34,6 +35,16 @@ CONFIG_FILE_PATH = CONFIG_DIR / CONFIG_FILENAME
 
 # The name of the environment variable, which points to the config file.
 CONFIG_FILE_ENV_VAR = 'CAMBIATO_CONFIG_FILE'
+
+# The default url to the Bitwarden Passwordless.dev backend API.
+BITWARDEN_PASSWORDLESS_API_URL = stp.BITWARDEN_PASSWORDLESS_API_URL
+
+
+class Language(StrEnum):
+    r"""The available languages of Cambiato."""
+
+    EN = 'English'
+    SV = 'Swedish'
 
 
 class BaseConfigModel(BaseModel):
@@ -89,7 +100,30 @@ class DatabaseConfig(BaseConfigModel):
         try:
             return stp.db.create_db_url(url)
         except stp.DatabaseInvalidUrlError as e:
-            raise ValueError(f'{type(e).__name__} : {str(e)}') from None
+            raise ValueError(f'{type(e).__name__} : {e!s}') from None
+
+
+class BitwardenPasswordlessConfig(BaseConfigModel):
+    r"""The configuration for Bitwarden Passwordless.dev.
+
+    Bitwarden Passwordless.dev handles the passkey registration and authentication.
+
+    Parameters
+    ----------
+    public_key : str, default ''
+         The public key of the Bitwarden Passwordless.dev backend API.
+
+    private_key : str, default ''
+         The private key of the Bitwarden Passwordless.dev backend API.
+
+    url : pydantic.AnyHttpUrl or str, default default 'https://v4.passwordless.dev'
+        The base url of the backend API of Bitwarden Passwordless.dev. Specify this url
+        if you are self-hosting Bitwarden Passwordless.dev.
+    """
+
+    public_key: str
+    private_key: str
+    url: AnyHttpUrl = stp.BITWARDEN_PASSWORDLESS_API_URL
 
 
 class ConfigManager(BaseConfigModel):
@@ -102,14 +136,24 @@ class ConfigManager(BaseConfigModel):
         The special path '-' specifies that the config was loaded from stdin.
         If None the default configuration was loaded.
 
+    language : cambiato.Language, default cambiato.Language.EN
+        The default language to use when starting the application. The default is English.
+
     database : cambiato.DatabaseConfig
         The database configuration.
+
+    bwp : cambiato.BitwardenPasswordlessConfig
+        The configuration for Bitwarden Passwordless.dev.
     """
 
     model_config = ConfigDict(frozen=True)
 
     config_file_path: Path | None = None
+    language: Language = Language.EN
     database: DatabaseConfig = Field(default_factory=DatabaseConfig)
+    bwp: BitwardenPasswordlessConfig = Field(
+        validation_alias=AliasChoices('bwp', 'bitwarden_passwordless', 'bitwarden_passwordless_dev')
+    )
 
 
 def load_config(path: Path | None = None) -> ConfigManager:
@@ -145,7 +189,7 @@ def load_config(path: Path | None = None) -> ConfigManager:
     Raises
     ------
     cambiato.ConfigError
-        If the configuration is invalid.
+        If the configuration is invalid or if no configuration was found.
 
     cambiato.ConfigFileNotFoundError
         If the configuration file could not be found.
@@ -154,15 +198,15 @@ def load_config(path: Path | None = None) -> ConfigManager:
         If there are syntax errors in the config file.
     """
 
+    file_path: Path | None = None
+
     if path is None:
         if (_file_path := os.getenv(CONFIG_FILE_ENV_VAR)) is None:
             file_path = CONFIG_FILE_PATH
         else:
             file_path = Path(_file_path)
     else:
-        if path.name == '-':  # stdin
-            file_path = None
-        else:
+        if path.name != '-':  # stdin
             file_path = path
 
     config_content = None
@@ -170,15 +214,13 @@ def load_config(path: Path | None = None) -> ConfigManager:
 
     if file_path:
         file_path_str = str(file_path)
+
         if file_path.is_dir():
             error_msg = f'The config file "{file_path}" must be a file not a directory!'
             raise exceptions.ConfigFileNotFoundError(message=error_msg, data=file_path)
 
         if file_path == CONFIG_FILE_PATH:
-            if file_path.exists():
-                config_content = file_path.read_text()
-            else:
-                config_content = None
+            config_content = file_path.read_text() if file_path.exists() else None
         elif not file_path.exists():
             error_msg = f'The config file "{file_path}" does not exist!'
             raise exceptions.ConfigFileNotFoundError(message=error_msg, data=file_path)
@@ -190,7 +232,7 @@ def load_config(path: Path | None = None) -> ConfigManager:
         file_path_str = '-' if config_content else file_path_str
 
     if not config_content:
-        return ConfigManager(config_file_path=None)
+        raise exceptions.ConfigError('No configuration found! Check your sources!')
 
     config_content = f"config_file_path = '{file_path_str}'\n{config_content}"
 
