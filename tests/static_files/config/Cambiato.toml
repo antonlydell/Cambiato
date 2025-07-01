@@ -1,5 +1,5 @@
 [database]
-url = ':url'
+url = ':db_url'
 autoflush = false
 expire_on_commit = true
 create_database = true
@@ -9,3 +9,7 @@ timeout = 30
 
 [database.engine_config]
 echo = true
+
+[bitwarden_passwordless]
+public_key = 'bwp_public_key'
+private_key = 'bwp_private_key'
