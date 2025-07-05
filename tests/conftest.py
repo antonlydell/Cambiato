@@ -11,8 +11,8 @@ import pytest
 from sqlalchemy import make_url
 
 # Local
-import cambiato.config
-from cambiato.config import BITWARDEN_PASSWORDLESS_API_URL, CONFIG_FILE_ENV_VAR, Language
+import cambiato.config.config
+from cambiato.config import BITWARDEN_PASSWORDLESS_API_URL, Language
 from tests.config import STATIC_FILES_CONFIG_BASE_DIR
 
 
@@ -20,7 +20,7 @@ from tests.config import STATIC_FILES_CONFIG_BASE_DIR
 def remove_config_file_env_var(monkeypatch: pytest.MonkeyPatch) -> None:
     r"""Remove the config file environment variable CAMBIATO_CONFIG_FILE."""
 
-    monkeypatch.delenv(CONFIG_FILE_ENV_VAR, raising=False)
+    monkeypatch.delenv(cambiato.config.config.CONFIG_FILE_ENV_VAR, raising=False)
 
 
 @pytest.fixture
@@ -120,7 +120,7 @@ def config_in_stdin(
     config_exp = deepcopy(config_exp_original)
     config_exp['config_file_path'] = Path('-')
 
-    monkeypatch.setattr(cambiato.config.sys, 'stdin', io.StringIO(config_data_str))
+    monkeypatch.setattr(cambiato.config.config.sys, 'stdin', io.StringIO(config_data_str))
 
     return config_data_str, config_exp
 
@@ -129,7 +129,7 @@ def config_in_stdin(
 def empty_stdin(monkeypatch: pytest.MonkeyPatch) -> None:
     r"""A mocked stdin that is empty."""
 
-    monkeypatch.setattr(cambiato.config.sys, 'stdin', io.StringIO(''))
+    monkeypatch.setattr(cambiato.config.config.sys, 'stdin', io.StringIO(''))
 
 
 @pytest.fixture
@@ -163,7 +163,7 @@ def config_file_from_config_env_var(
     config_exp = deepcopy(config_exp_original)
     config_exp['config_file_path'] = config_file_path
 
-    monkeypatch.setenv(CONFIG_FILE_ENV_VAR, str(config_file_path))
+    monkeypatch.setenv(cambiato.config.config.CONFIG_FILE_ENV_VAR, str(config_file_path))
 
     return config_file_path, config_data_str, config_exp
 
@@ -196,7 +196,7 @@ def config_file_from_default_location(
     config_file_path = tmp_path / 'Cambiato_from_default_location.toml'
     config_file_path.write_text(config_data_str)
 
-    monkeypatch.setattr(cambiato.config, 'CONFIG_FILE_PATH', config_file_path)
+    monkeypatch.setattr(cambiato.config.config, 'CONFIG_FILE_PATH', config_file_path)
 
     config_exp = deepcopy(config_exp_original)
     config_exp['config_file_path'] = config_file_path
@@ -218,7 +218,7 @@ def default_config_file_location_does_not_exist(
 
     config_file_path = tmp_path / 'Cambiato_default_does_not_exist.toml'
 
-    monkeypatch.setattr(cambiato.config, 'CONFIG_FILE_PATH', config_file_path)
+    monkeypatch.setattr(cambiato.config.config, 'CONFIG_FILE_PATH', config_file_path)
 
     return config_file_path
 

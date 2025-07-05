@@ -1,129 +1,24 @@
-r"""The configuration of Cambiato."""
+r"""The ConfigManager and the config loading functions."""
 
 # Standard library
-import logging
 import os
 import sys
 import tomllib
-from enum import StrEnum
 from pathlib import Path
-from typing import Any
 
 # Third party
-import streamlit_passwordless as stp
-from pydantic import AliasChoices, AnyHttpUrl, ConfigDict, Field, field_validator
-from sqlalchemy import URL
+from pydantic import AliasChoices, ConfigDict, Field
 
 # Local
 from cambiato import exceptions
-from cambiato.models.core import BaseModel
-
-logger = logging.getLogger(__name__)
-
-
-# Name of the program.
-PROG_NAME = 'Cambiato'
-
-# The config directory of the program.
-CONFIG_DIR = Path.home() / '.config' / PROG_NAME
-
-# The name of the default config file.
-CONFIG_FILENAME = f'{PROG_NAME}.toml'
-
-# The full path to the default config file.
-CONFIG_FILE_PATH = CONFIG_DIR / CONFIG_FILENAME
-
-# The name of the environment variable, which points to the config file.
-CONFIG_FILE_ENV_VAR = 'CAMBIATO_CONFIG_FILE'
-
-# The default url to the Bitwarden Passwordless.dev backend API.
-BITWARDEN_PASSWORDLESS_API_URL = stp.BITWARDEN_PASSWORDLESS_API_URL
-
-
-class Language(StrEnum):
-    r"""The available languages of Cambiato."""
-
-    EN = 'English'
-    SV = 'Swedish'
-
-
-class BaseConfigModel(BaseModel):
-    r"""The base model that all configuration models inherit from."""
-
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
-        try:
-            super().__init__(**kwargs)
-        except exceptions.CambiatoError as e:
-            raise exceptions.ConfigError(str(e)) from None
-
-
-class DatabaseConfig(BaseConfigModel):
-    r"""The database configuration for Cambiato.
-
-    Parameters
-    ----------
-    url : str or sqlalchemy.URL, default 'sqlite:///Cambiato.db'
-        The SQLAlchemy database url of the Cambiato database.
-
-    autoflush : bool, default False
-        Automatically flush pending changes within the session
-        to the database before executing new SQL statements.
-
-    expire_on_commit : bool, default False
-        If True make the connection between the models and the database expire after a
-        transaction within a session has been committed and if False make the database models
-        accessible after the commit.
-
-    create_database : bool, default True
-        If True the database table schema will be created if it does not exist.
-
-    connect_args : dict[Any, Any], default dict()
-        Additional arguments sent to the database driver upon
-        connection that further customizes the connection.
-
-    engine_config : dict[str, Any], default dict()
-        Additional keyword arguments passed to the :func:`sqlalchemy.create_engine` function.
-    """
-
-    url: str | URL = Field(default='sqlite:///Cambiato.db', validate_default=True)
-    autoflush: bool = False
-    expire_on_commit: bool = False
-    create_database: bool = True
-    connect_args: dict[Any, Any] = Field(default_factory=dict)
-    engine_config: dict[str, Any] = Field(default_factory=dict)
-
-    @field_validator('url')
-    @classmethod
-    def validate_url(cls, url: str | URL) -> stp.db.URL:
-        r"""Validate the database url."""
-
-        try:
-            return stp.db.create_db_url(url)
-        except stp.DatabaseInvalidUrlError as e:
-            raise ValueError(f'{type(e).__name__} : {e!s}') from None
-
-
-class BitwardenPasswordlessConfig(BaseConfigModel):
-    r"""The configuration for Bitwarden Passwordless.dev.
-
-    Bitwarden Passwordless.dev handles the passkey registration and authentication.
-
-    Parameters
-    ----------
-    public_key : str, default ''
-         The public key of the Bitwarden Passwordless.dev backend API.
-
-    private_key : str, default ''
-         The private key of the Bitwarden Passwordless.dev backend API.
-
-    url : pydantic.AnyHttpUrl or str, default default 'https://v4.passwordless.dev'
-        The base url of the backend API of Bitwarden Passwordless.dev. Specify this url
-        if you are self-hosting Bitwarden Passwordless.dev.
-    """
-
-    public_key: str
-    private_key: str
-    url: AnyHttpUrl = stp.BITWARDEN_PASSWORDLESS_API_URL
+from cambiato.config.core import (
+    CONFIG_FILE_ENV_VAR,
+    CONFIG_FILE_PATH,
+    BaseConfigModel,
+    BitwardenPasswordlessConfig,
+    DatabaseConfig,
+    Language,
+)
 
 
 class ConfigManager(BaseConfigModel):
@@ -154,11 +49,6 @@ class ConfigManager(BaseConfigModel):
     bwp: BitwardenPasswordlessConfig = Field(
         validation_alias=AliasChoices('bwp', 'bitwarden_passwordless', 'bitwarden_passwordless_dev')
     )
-
-
-# =================================================================================================
-# Config loading functions
-# =================================================================================================
 
 
 def _load_config_from_stdin() -> str:
@@ -217,8 +107,8 @@ def load_config(path: Path | None = None) -> ConfigManager:
         The path to the config file. Specify `Path('-')` for stdin. If None the configuration
         will be loaded from the config file environment variable "CAMBIATO_CONFIG_FILE" if it
         exists otherwise from the default config file at "~/.config/Cambiato/Cambiato.toml".
-        If none of these sources exist the default configuration will be loaded unless config
-        exists in stdin, in which case the stdin configuration will be loaded.
+        If none of these sources exist stdin will be searched for configuration and if no
+        configuration is found :exc:`cambiato.ConfigError` will be raised.
 
     Returns
     -------
