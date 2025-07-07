@@ -12,7 +12,14 @@ from sqlalchemy import make_url
 
 # Local
 import cambiato.config.config
-from cambiato.config import BITWARDEN_PASSWORDLESS_API_URL, Language
+from cambiato.config import (
+    BITWARDEN_PASSWORDLESS_API_URL,
+    LOGGING_DEFAULT_DATETIME_FORMAT,
+    LOGGING_DEFAULT_FORMAT,
+    Language,
+    LogLevel,
+    Stream,
+)
 from tests.config import STATIC_FILES_CONFIG_BASE_DIR
 
 
@@ -45,8 +52,11 @@ def config_data(tmp_path: Path) -> tuple[str, dict[str, Any]]:
 
     db_path = tmp_path / 'Cambiato.db'
     db_url_str = f'sqlite:///{db_path!s}'
+    web_log_file_path = tmp_path / 'Cambiato.log'
 
-    config_data_str = config_data_str.replace(':db_url', db_url_str)
+    config_data_str = config_data_str.replace(':db_url', db_url_str).replace(
+        ':web_log_file_path', str(web_log_file_path)
+    )
 
     database_config = {
         'url': tuple(make_url(db_url_str)),
@@ -62,11 +72,49 @@ def config_data(tmp_path: Path) -> tuple[str, dict[str, Any]]:
         'private_key': 'bwp_private_key',
         'url': BITWARDEN_PASSWORDLESS_API_URL,
     }
+    logging_config = {
+        'disabled': False,
+        'min_log_level': LogLevel.INFO,
+        'format': LOGGING_DEFAULT_FORMAT,
+        'datetime_format': LOGGING_DEFAULT_DATETIME_FORMAT,
+        'stream': {
+            'stdout': {
+                'stream': Stream.STDOUT,
+                'disabled': False,
+                'min_log_level': LogLevel.INFO,
+                'format': LOGGING_DEFAULT_FORMAT,
+                'datetime_format': LOGGING_DEFAULT_DATETIME_FORMAT,
+            },
+            'stderr': {
+                'stream': Stream.STDERR,
+                'disabled': False,
+                'min_log_level': LogLevel.ERROR,
+                'format': LOGGING_DEFAULT_FORMAT,
+                'datetime_format': LOGGING_DEFAULT_DATETIME_FORMAT,
+            },
+        },
+        'file': {
+            'web': {
+                'unique': False,
+                'path': web_log_file_path,
+                'max_bytes': 1_200_000,
+                'backup_count': 5,
+                'mode': 'a',
+                'encoding': 'UTF-8',
+                'disabled': False,
+                'min_log_level': LogLevel.INFO,
+                'format': LOGGING_DEFAULT_FORMAT,
+                'datetime_format': LOGGING_DEFAULT_DATETIME_FORMAT,
+            }
+        },
+        'email': None,
+    }
 
     config_exp = {
         'language': Language.EN,
         'database': database_config,
         'bwp': bwp_config,
+        'logging': logging_config,
     }
 
     return config_data_str, config_exp

@@ -19,6 +19,7 @@ from cambiato.config.core import (
     DatabaseConfig,
     Language,
 )
+from cambiato.config.log import LoggingConfig
 
 
 class ConfigManager(BaseConfigModel):
@@ -39,6 +40,9 @@ class ConfigManager(BaseConfigModel):
 
     bwp : cambiato.BitwardenPasswordlessConfig
         The configuration for Bitwarden Passwordless.dev.
+
+    logging : cambiato.LoggingConfig
+        The logging configuration.
     """
 
     model_config = ConfigDict(frozen=True)
@@ -49,6 +53,7 @@ class ConfigManager(BaseConfigModel):
     bwp: BitwardenPasswordlessConfig = Field(
         validation_alias=AliasChoices('bwp', 'bitwarden_passwordless', 'bitwarden_passwordless_dev')
     )
+    logging: LoggingConfig = Field(default_factory=LoggingConfig)
 
 
 def _load_config_from_stdin() -> str:
