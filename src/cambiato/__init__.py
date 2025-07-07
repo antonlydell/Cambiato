@@ -26,6 +26,7 @@ from cambiato.exceptions import (
     ConfigFileNotFoundError,
     ParseConfigError,
 )
+from cambiato.log import setup_logging
 from cambiato.metadata import (
     __releasedate__,
     __version__,
@@ -59,4 +60,6 @@ __all__ = [
     'ConfigError',
     'ConfigFileNotFoundError',
     'ParseConfigError',
+    # log
+    'setup_logging',
 ]
