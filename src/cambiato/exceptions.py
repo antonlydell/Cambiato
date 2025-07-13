@@ -3,6 +3,9 @@ r"""The exception hierarchy of Cambiato."""
 # Standard library
 from typing import Any
 
+# Third party
+from sqlalchemy.exc import SQLAlchemyError as SQLAlchemyError
+
 
 class CambiatoError(Exception):
     r"""The base Exception of Cambiato.
