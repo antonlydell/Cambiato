@@ -8,3 +8,4 @@ class Pages(StrEnum):
     r"""The pages of the application."""
 
     HOME = '_pages/home.py'
+    SIGN_IN = '_pages/sign_in.py'
