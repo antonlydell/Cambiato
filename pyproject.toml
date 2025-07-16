@@ -118,9 +118,8 @@ markers = [
 
 [tool.mypy]
 plugins = ["pydantic.mypy"]
+disallow_incomplete_defs = true
+warn_redundant_casts = true
 warn_return_any = true
 warn_unreachable = true
-
-[[tool.mypy.overrides]]
-module = ["cambiato.*"]
-ignore_missing_imports = true
+warn_unused_ignores = true
