@@ -46,7 +46,7 @@ def init_page() -> None:
     try:
         cm = load_config()
     except exceptions.ConfigError as e:
-        error_msg = f'Error loading configuration!\n{str(e)}'
+        error_msg = f'Error loading configuration!\n{e!s}'
         logger.error(error_msg)
         st.error(error_msg, icon=stp.ICON_ERROR)
         return
@@ -65,5 +65,5 @@ def init_page() -> None:
         controller(session=session, db_url=cfg.url)
 
 
-if __name__ == '__main__' or __name__ == '__page__':
+if __name__ in {'__main__', '__page__'}:
     init_page()

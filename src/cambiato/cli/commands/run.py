@@ -5,8 +5,8 @@ Run the Cambiato web apps.
 
 # Standard library
 import subprocess
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
 
 # Third party
 import click
@@ -34,7 +34,7 @@ def run_streamlit_app(path: Path | str, streamlit_args: Iterable[str]) -> None:
     run_cmd.extend(streamlit_args)
 
     click.echo('Launching Streamlit ...')
-    subprocess.run(run_cmd)
+    subprocess.run(run_cmd)  # noqa: S603, PLW1510
 
 
 @click.group()

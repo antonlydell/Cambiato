@@ -25,15 +25,15 @@ class TestInit:
         # Setup
         # ===========================================================
         db = tmp_path / 'Cambiato.db'
-        url = f'sqlite:///{str(db)}'
+        url = f'sqlite:///{db!s}'
         session_factory = create_session_factory(url=url, create_database=True)
 
         get_tables_query = text("SELECT name FROM sqlite_master WHERE type = 'table'")
-        tables_exp = set(
+        tables_exp = {
             t.__tablename__
             for m in models.__dict__
             if hasattr(t := getattr(models, m), '__tablename__')
-        )
+        }
 
         # Tables with default records.
         queries = {
@@ -64,7 +64,7 @@ class TestInit:
         # Verify
         # ===========================================================
         with session_factory() as session:
-            tables = set(t for t in session.scalars(get_tables_query))
+            tables = {t for t in session.scalars(get_tables_query)}  # noqa: C416
 
             for table, query in queries.items():
                 count = session.scalars(query).one()

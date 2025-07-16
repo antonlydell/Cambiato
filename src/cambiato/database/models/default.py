@@ -32,8 +32,8 @@ bool_dtype = DType(dtype_id=4, name='BOOLEAN')
 timestamp_dtype = DType(dtype_id=5, name='TIMESTAMP')
 
 # Unit
-kWh_unit = Unit(unit_id=1, name='kWh', description='kilo Watt hours')
-kVArh_unit = Unit(unit_id=2, name='kVArh', description='kilo Volt Ampere reactive hours')
+kWh_unit = Unit(unit_id=1, name='kWh', description='kilo Watt hours')  # noqa: N816
+kVArh_unit = Unit(unit_id=2, name='kVArh', description='kilo Volt Ampere reactive hours')  # noqa: N816
 MWh_unit = Unit(unit_id=3, name='MWh', description='Mega Watt hours')
 m3_unit = Unit(unit_id=4, name='m3', description='Cubic Meters')
 degrees_celsius_unit = Unit(unit_id=5, name='°C', description='Degrees Celsius')

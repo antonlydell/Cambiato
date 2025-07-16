@@ -67,7 +67,42 @@ line-length = 100
 target-version = "py311"
 
 [tool.ruff.lint]
-ignore = ['E501']
+select = [
+    "ERA",  # eradicate
+    "S",    # flake8-bandit
+    "B",    # flake8-bugbear
+    "A",    # flake8-builtins
+    "C4",   # flake8-comprehensions
+    "ICN",  # flake8-import-conventions
+    "T20",  # flake8-print
+    "PT",   # flake8-pytest-style
+    "RET",  # flake8-return
+    "SIM",  # flake8-simplify
+    "TID",  # flake8-tidy-imports
+    "ARG",  # flake8-unused-arguments
+    "I",    # isort
+    "C90",  # mccabe
+    "F",    # Pyflakes
+    "N",    # pep8-naming
+    "E",    # pycodestyle (Error)
+    "W",    # pycodestyle (Warning)
+    "PL",   # pylint
+    "RUF",  # Ruff-specific rules
+    "UP",   # pyupgrade
+]
+ignore = [
+    "E501",     # Line too long ({width} > {limit})
+    "RUF022",   # __all__ is not sorted
+    "PLC0414",  # Import alias does not rename original package
+    "PLR0913",  # Too many arguments in function definition
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**.py" = [
+  "PLR2004",  # Magic value used in comparison, consider replacing {value} with a constant variable
+  "S101",     # Use of assert detected
+  "T20",      # flake8-print
+]
 
 [tool.ruff.format]
 quote-style = "single"

@@ -44,5 +44,5 @@ def sign_in_page() -> None:
         controller(session=session, client=bwp_client, authenticated=authenticated)
 
 
-if __name__ == '__main__' or __name__ == '__page__':
+if __name__ in {'__main__', '__page__'}:
     sign_in_page()

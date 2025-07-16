@@ -39,5 +39,5 @@ def home_page() -> None:
     st.subheader('The simple yet powerful system for changing utility devices')
 
 
-if __name__ == '__main__' or __name__ == '__page__':
+if __name__ in {'__main__', '__page__'}:
     home_page()
