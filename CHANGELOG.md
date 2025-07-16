@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.3.0] - 2025-07-16
+
+Register and sign in!
+
+You may now register a passkey for your user and sign in, given that the user already exists
+in the database. Added support to configure and setup logging for the application.
+
+
 ## [0.2.0] - 2025-06-28
 
 Initialize the database!
@@ -42,7 +50,8 @@ A first release and declaration of the project.
 - Registration on [PyPI](https://pypi.org/project/Cambiato/0.1.0/).
 
 
-[Unreleased]: https://github.com/antonlydell/Cambiato/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/antonlydell/Cambiato/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/antonlydell/Cambiato/releases/tag/v0.3.0
 [0.2.0]: https://github.com/antonlydell/Cambiato/releases/tag/v0.2.0
 [0.1.1]: https://github.com/antonlydell/Cambiato/releases/tag/v0.1.1
 [0.1.0]: https://github.com/antonlydell/Cambiato/releases/tag/v0.1.0
