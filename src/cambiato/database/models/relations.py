@@ -1729,15 +1729,15 @@ class Order(ModifiedAndCreatedColumnMixin, Base):
     ext_id : str or None
         The unique reference ID to the order in an external system. Is indexed.
 
-    facility_id : int
+    facility_id : int or None
         The facility the order is targeting. Foreign key to :attr:`Facility.facility_id`.
         Is indexed.
 
-    location_id : int
+    location_id : int or None
         The location where the order takes place. Foreign key to :attr:`Location.location_id`.
         Is indexed.
 
-    customer_id : int
+    customer_id : int or None
         The ID of the customer that owned the target facility of the order at the time when
         the order was carried out. Foreign key to :attr:`Customer.customer_id`. Is indexed.
 
@@ -1807,8 +1807,8 @@ class Order(ModifiedAndCreatedColumnMixin, Base):
     order_type_id: Mapped[int] = mapped_column(ForeignKey(OrderType.order_type_id))
     order_status_id: Mapped[int] = mapped_column(ForeignKey(OrderStatus.order_status_id))
     ext_id: Mapped[str | None]
-    facility_id: Mapped[int] = mapped_column(ForeignKey(Facility.facility_id))
-    location_id: Mapped[int] = mapped_column(ForeignKey(Location.location_id))
+    facility_id: Mapped[int | None] = mapped_column(ForeignKey(Facility.facility_id))
+    location_id: Mapped[int | None] = mapped_column(ForeignKey(Location.location_id))
     customer_id: Mapped[int | None] = mapped_column(
         ForeignKey(Customer.customer_id, ondelete='SET NULL')
     )
