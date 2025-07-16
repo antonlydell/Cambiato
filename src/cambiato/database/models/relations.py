@@ -203,6 +203,7 @@ class Location(ModifiedAndCreatedColumnMixin, Base):
 
     location_type: Mapped[LocationType] = relationship(back_populates='locations')
     coordinate_system: Mapped[CoordinateSystem] = relationship()
+    facilities: Mapped[list['Facility']] = relationship(back_populates='location')
 
 
 Index(f'{Location.__tablename__}_ext_id_uix', Location.ext_id, unique=True)
@@ -985,6 +986,10 @@ class Facility(ModifiedAndCreatedColumnMixin, Base):
         The ID of the customer who owns the facility. Foreign key to
         :attr:`Customer.customer_id`. Is indexed.
 
+    location_id : int or None
+        The ID of the location where the facility is located. Foreign key to
+        :attr:`Location.location_id`. Is indexed.
+
     ext_id : str or None
         The unique ID of the facility in an external system. Must be unique. Is indexed.
 
@@ -1049,6 +1054,7 @@ class Facility(ModifiedAndCreatedColumnMixin, Base):
     columns__repr__: ClassVar[tuple[str, ...]] = (
         'facility_id',
         'customer_id',
+        'location_id',
         'ext_id',
         'ean',
         'name',
@@ -1073,6 +1079,7 @@ class Facility(ModifiedAndCreatedColumnMixin, Base):
 
     facility_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     customer_id: Mapped[int | None] = mapped_column(ForeignKey(Customer.customer_id))
+    location_id: Mapped[int | None] = mapped_column(ForeignKey(Location.location_id))
     ext_id: Mapped[str | None]
     ean: Mapped[int | None]
     name: Mapped[str | None]
@@ -1094,10 +1101,12 @@ class Facility(ModifiedAndCreatedColumnMixin, Base):
 
     devices: Mapped[list['DeviceFacilityLink']] = relationship(back_populates='facility')
     customer: Mapped[Customer] = relationship(back_populates='facilities')
+    location: Mapped[Location] = relationship(back_populates='facilities')
     images: Mapped[list['Image']] = relationship(back_populates='facility')
 
 
 Index(f'{Facility.__tablename__}_customer_id_ix', Facility.customer_id)
+Index(f'{Facility.__tablename__}_location_id_ix', Facility.location_id)
 Index(f'{Facility.__tablename__}_ext_id_uix', Facility.ext_id, unique=True)
 Index(f'{Facility.__tablename__}_ean_uix', Facility.ean, unique=True)
 Index(f'{Facility.__tablename__}_key_id_ix', Facility.key_id)
