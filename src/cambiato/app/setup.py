@@ -10,6 +10,7 @@ import streamlit_passwordless as stp
 # Local
 from cambiato import exceptions
 from cambiato.app.config import ICON_ERROR
+from cambiato.app.translations import load_translation
 from cambiato.config import load_config
 from cambiato.database import create_session_factory
 from cambiato.log import setup_logging
@@ -43,3 +44,5 @@ except exceptions.SQLAlchemyError as e:
 bwp_client = stp.BitwardenPasswordlessClient(
     public_key=cm.bwp.public_key, private_key=cm.bwp.private_key
 )
+
+translations = {lang: load_translation(lang) for lang in cm.languages}
