@@ -32,8 +32,11 @@ class ConfigManager(BaseConfigModel):
         The special path '-' specifies that the config was loaded from stdin.
         If None the default configuration was loaded.
 
-    language : cambiato.Language, default cambiato.Language.EN
-        The default language to use when starting the application. The default is English.
+    languages : tuple[cambiato.Language, ...], default (cambiato.Language.EN,)
+        The languages to make available to the application. The default is English.
+
+    default_language : cambiato.Language, default cambiato.Language.EN
+        The default language to use when the application first loads. The default is English.
 
     database : cambiato.DatabaseConfig
         The database configuration.
@@ -48,7 +51,8 @@ class ConfigManager(BaseConfigModel):
     model_config = ConfigDict(frozen=True)
 
     config_file_path: Path | None = None
-    language: Language = Language.EN
+    languages: tuple[Language, ...] = (Language.EN,)
+    default_language: Language = Language.EN
     database: DatabaseConfig = Field(default_factory=DatabaseConfig)
     bwp: BitwardenPasswordlessConfig = Field(
         validation_alias=AliasChoices('bwp', 'bitwarden_passwordless', 'bitwarden_passwordless_dev')

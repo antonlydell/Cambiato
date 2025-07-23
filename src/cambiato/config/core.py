@@ -32,10 +32,13 @@ BITWARDEN_PASSWORDLESS_API_URL = stp.BITWARDEN_PASSWORDLESS_API_URL
 
 
 class Language(StrEnum):
-    r"""The available languages of Cambiato."""
+    r"""The available languages of Cambiato.
 
-    EN = 'English'
-    SV = 'Swedish'
+    Uses ISO 639 two letter abbreviations.
+    """
+
+    EN = 'en'
+    SV = 'sv'
 
 
 class BaseConfigModel(BaseModel):

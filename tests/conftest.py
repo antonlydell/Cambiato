@@ -111,7 +111,8 @@ def config_data(tmp_path: Path) -> tuple[str, dict[str, Any]]:
     }
 
     config_exp = {
-        'language': Language.EN,
+        'languages': (Language.EN,),
+        'default_language': Language.EN,
         'database': database_config,
         'bwp': bwp_config,
         'logging': logging_config,

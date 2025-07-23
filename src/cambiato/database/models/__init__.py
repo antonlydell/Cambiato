@@ -1,5 +1,8 @@
 r"""The database tables."""
 
+# Third party
+from streamlit_passwordless.database.models import CustomRole, Email, Role, User, UserSignIn
+
 # Local
 from .core import (
     SCHEMA,
@@ -103,4 +106,10 @@ __all__ = [
     'OrderStatus',
     'OrderType',
     'PhoneType',
+    # streamlit-passwordless
+    'CustomRole',
+    'Email',
+    'Role',
+    'User',
+    'UserSignIn',
 ]

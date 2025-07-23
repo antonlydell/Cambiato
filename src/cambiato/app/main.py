@@ -24,6 +24,7 @@ def main() -> None:
     pages = [
         st.Page(page=Pages.HOME, title='Home'),
         st.Page(page=Pages.SIGN_IN, title='Sign in and register', default=True),
+        st.Page(page=Pages.ORDER, title='Order'),
     ]
     page = st.navigation(pages, position='top' if authenticated else 'hidden')
 

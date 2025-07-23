@@ -9,3 +9,4 @@ class Pages(StrEnum):
 
     HOME = '_pages/home.py'
     SIGN_IN = '_pages/sign_in.py'
+    ORDER = '_pages/order.py'
