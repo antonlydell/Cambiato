@@ -4,6 +4,7 @@ r"""The default data of the tables."""
 from cambiato.database.core import Session
 from cambiato.database.models.core import (
     CoordinateSystem,
+    CustomRole,
     DType,
     KeyType,
     Unit,
@@ -67,7 +68,7 @@ dc_utility = Utility(
     utility_id=3, name='District Cooling', description='The district cooling utility.'
 )
 water_utility = Utility(utility_id=4, name='Water', description='The water utility.')
-water_utility = Utility(utility_id=5, name='Gas', description='The gas utility.')
+gas_utility = Utility(utility_id=5, name='Gas', description='The gas utility.')
 
 # CoordinateSystem
 wgs84_coord_system = CoordinateSystem(
@@ -297,6 +298,20 @@ completed_order_status = OrderStatus(
     order_status_id=6, name='Completed', description='An order that has been fully completed.'
 )
 
+# Role
+technician = CustomRole(
+    role_id=1,
+    name='Technician',
+    rank=1,
+    description='A technician carries out orders in the field.',
+)
+coordinator = CustomRole(
+    role_id=2,
+    name='Coordinator',
+    rank=2,
+    description='A coordinator manages orders and assigns them to technicians.',
+)
+
 
 def add_default_models_to_session(session: Session) -> None:
     r"""Create the default models in the database.
@@ -336,7 +351,7 @@ def add_default_models_to_session(session: Session) -> None:
             dh_utility,
             dc_utility,
             water_utility,
-            water_utility,
+            gas_utility,
             # CoordinateSystem
             wgs84_coord_system,
             sweref991200_coord_system,
@@ -396,5 +411,8 @@ def add_default_models_to_session(session: Session) -> None:
             on_hold_order_status,
             completed_by_technician_order_status,
             completed_order_status,
+            # Role
+            technician,
+            coordinator,
         )
     )
