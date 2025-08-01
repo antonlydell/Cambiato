@@ -11,7 +11,6 @@ import streamlit as st
 from cambiato.app.components import keys
 from cambiato.app.components.core import BannerContainerMapping, process_form_validation_errors
 from cambiato.app.session_state import CREATE_ORDER_FORM_VALIDATION_ERRORS
-from cambiato.app.translations import CreateOrderForm, CreateOrderFormValidationMessage
 from cambiato.database import Session
 from cambiato.database.models import (
     Checklist,
@@ -22,6 +21,7 @@ from cambiato.database.models import (
     OrderType,
     User,
 )
+from cambiato.translations import CreateOrderForm, CreateOrderFormValidationMessage
 
 
 class FormField(StrEnum):

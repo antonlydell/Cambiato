@@ -4,10 +4,10 @@ r"""Core functionality to work with translations."""
 from importlib.resources import files
 
 # Local
-from cambiato.app.translations.database import Database
-from cambiato.app.translations.order import Order
 from cambiato.config import Language
 from cambiato.models.core import BaseModel
+from cambiato.translations.database import Database
+from cambiato.translations.order import Order
 
 
 class TranslationModel(BaseModel):
@@ -40,6 +40,6 @@ def load_translation(language: Language) -> TranslationModel:
         The model of the translations for the application.
     """
 
-    lang_file = files('cambiato.app.translations.translations').joinpath(f'{language}.json')
+    lang_file = files('cambiato.translations.translations').joinpath(f'{language}.json')
 
     return TranslationModel.model_validate_json(lang_file.read_text())

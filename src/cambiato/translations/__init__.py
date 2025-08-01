@@ -1,9 +1,9 @@
 r"""Language translations for the application."""
 
 # Local
-from cambiato.app.translations.core import TranslationModel, load_translation
-from cambiato.app.translations.database import Database
-from cambiato.app.translations.order import CreateOrderForm, CreateOrderFormValidationMessage, Order
+from cambiato.translations.core import TranslationModel, load_translation
+from cambiato.translations.database import Database
+from cambiato.translations.order import CreateOrderForm, CreateOrderFormValidationMessage, Order
 
 # The Public API
 __all__ = [

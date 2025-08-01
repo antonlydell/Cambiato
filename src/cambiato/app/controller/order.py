@@ -5,8 +5,8 @@ import streamlit as st
 
 # Local
 from cambiato.app.components.forms.create_order_form import create_order_form
-from cambiato.app.translations import Order
 from cambiato.database import Session
+from cambiato.translations import Order
 
 
 def controller(session: Session, translation: Order) -> None:
