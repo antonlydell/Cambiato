@@ -982,6 +982,10 @@ class Facility(ModifiedAndCreatedColumnMixin, Base):
     facility_id : int
         The unique ID of the facility. The primary key of the table.
 
+    utility_id : int
+        The ID of the utility the facility belongs to. Foreign key to
+        :attr:`Utility.utility_id`. Is indexed.
+
     customer_id : int or None
         The ID of the customer who owns the facility. Foreign key to
         :attr:`Customer.customer_id`. Is indexed.
@@ -1053,6 +1057,7 @@ class Facility(ModifiedAndCreatedColumnMixin, Base):
 
     columns__repr__: ClassVar[tuple[str, ...]] = (
         'facility_id',
+        'utility_id',
         'customer_id',
         'location_id',
         'ext_id',
@@ -1078,6 +1083,7 @@ class Facility(ModifiedAndCreatedColumnMixin, Base):
     __tablename__ = 'facility'
 
     facility_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    utility_id: Mapped[int] = mapped_column(ForeignKey(Utility.utility_id))
     customer_id: Mapped[int | None] = mapped_column(ForeignKey(Customer.customer_id))
     location_id: Mapped[int | None] = mapped_column(ForeignKey(Location.location_id))
     ext_id: Mapped[str | None]
@@ -1100,11 +1106,13 @@ class Facility(ModifiedAndCreatedColumnMixin, Base):
     min_nr_technicians_at_device_change: Mapped[int | None]
 
     devices: Mapped[list['DeviceFacilityLink']] = relationship(back_populates='facility')
+    utility: Mapped[Utility] = relationship()
     customer: Mapped[Customer] = relationship(back_populates='facilities')
     location: Mapped[Location] = relationship(back_populates='facilities')
     images: Mapped[list['Image']] = relationship(back_populates='facility')
 
 
+Index(f'{Facility.__tablename__}_utility_id_ix', Facility.utility_id)
 Index(f'{Facility.__tablename__}_customer_id_ix', Facility.customer_id)
 Index(f'{Facility.__tablename__}_location_id_ix', Facility.location_id)
 Index(f'{Facility.__tablename__}_ext_id_uix', Facility.ext_id, unique=True)
