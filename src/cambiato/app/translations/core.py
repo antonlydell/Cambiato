@@ -4,6 +4,7 @@ r"""Core functionality to work with translations."""
 from importlib.resources import files
 
 # Local
+from cambiato.app.translations.database import Database
 from cambiato.app.translations.order import Order
 from cambiato.config import Language
 from cambiato.models.core import BaseModel
@@ -14,10 +15,14 @@ class TranslationModel(BaseModel):
 
     Parameters
     ----------
+    database : cambiato.translations.Database
+        The translations for the default data in the database.
+
     order : cambiato.translations.Order
         The translations for the order page.
     """
 
+    database: Database
     order: Order
 
 

@@ -1,4 +1,33 @@
 {
+    "database": {
+        "order_status": {
+            "1": {"name": "To do", "description": "An order that has yet not been started."},
+            "2": {"name": "Assigned", "description": "An order that is assigned to a technician, but it is yet not started."},
+            "3": {"name": "In Progress", "description": "An order that is in progress."},
+            "4": {"name": "On Hold", "description": "An order that is on hold and should not be worked on."},
+            "5": {"name": "Completed by Technician", "description": "An order that has been completed by a technician."},
+            "6": {"name": "Completed", "description": "An order that has been fully completed."}
+        },
+        "order_type": {
+            "1": {"name": "Device Change", "description": "An electricity meter change on a facility."},
+            "2": {"name": "Enable Device", "description": "Enable a new electricity meter on a facility."},
+            "3": {"name": "Disable Device", "description": "Disable an electricity meter on a facility."},
+            "4": {"name": "Communication Point Change", "description": "Change a communication point."},
+            "5": {"name": "Manual Reading", "description": "The technician needs to perform a manual reading of an electricity meter."},
+            "6": {"name": "Meter Alarm", "description": "The technician needs to investigate an alarm from a meter."}
+        },
+        "role": {
+            "1": {"name": "Technician", "description": "A technician carries out orders in the field"},
+            "2": {"name": "Coordinator", "description": "A coordinator manages orders and assigns them to technicians."}
+        },
+        "utility": {
+            "1": {"name": "Electricity", "description": "The electricity utility."},
+            "2": {"name": "District Heating", "description": "The district heating utility."},
+            "3": {"name": "District Cooling", "description": "The district cooling utility."},
+            "4": {"name": "Water", "description": "The water utility."},
+            "5": {"name": "Gas", "description": "The gas utility."}
+        }
+    },
     "order": {
         "page_title": "Order",
         "create_order_form" : {
