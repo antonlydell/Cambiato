@@ -5,7 +5,7 @@ from datetime import date, datetime
 from typing import ClassVar
 
 # Third party
-from sqlalchemy import TIMESTAMP, ForeignKey, Index, func
+from sqlalchemy import TIMESTAMP, BigInteger, ForeignKey, Index, false, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from streamlit_passwordless.database.models import Base, ModifiedAndCreatedColumnMixin, User
 
@@ -128,10 +128,10 @@ class Location(ModifiedAndCreatedColumnMixin, Base):
     zip_code : int or None
         The zip code of the location.
 
-    city : int or None
+    city : str or None
         The city or town of the location.
 
-    region : int or None
+    region : str or None
         The region of the location.
 
     country : str or None
@@ -197,8 +197,8 @@ class Location(ModifiedAndCreatedColumnMixin, Base):
     street_number_suffix: Mapped[str | None]
     apartment_number: Mapped[int | None]
     zip_code: Mapped[int | None]
-    city: Mapped[int | None]
-    region: Mapped[int | None]
+    city: Mapped[str | None]
+    region: Mapped[str | None]
     country: Mapped[str | None]
 
     location_type: Mapped[LocationType] = relationship(back_populates='locations')
@@ -392,7 +392,7 @@ class Customer(ModifiedAndCreatedColumnMixin, Base):
     preferred_contact_method_id: Mapped[int] = mapped_column(
         ForeignKey(ContactMethod.contact_method_id, ondelete='SET NULL')
     )
-    deceased: Mapped[bool] = mapped_column(default=False)
+    deceased: Mapped[bool] = mapped_column(server_default=false())
     description: Mapped[str | None]
 
     customer_type: Mapped[CustomerType] = relationship(back_populates='customers')
@@ -1087,7 +1087,7 @@ class Facility(ModifiedAndCreatedColumnMixin, Base):
     customer_id: Mapped[int | None] = mapped_column(ForeignKey(Customer.customer_id))
     location_id: Mapped[int | None] = mapped_column(ForeignKey(Location.location_id))
     ext_id: Mapped[str | None]
-    ean: Mapped[int | None]
+    ean: Mapped[int] = mapped_column(BigInteger)
     name: Mapped[str | None]
     common_name: Mapped[str | None]
     description: Mapped[str | None]
