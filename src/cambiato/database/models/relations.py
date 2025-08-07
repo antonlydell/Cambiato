@@ -1616,6 +1616,8 @@ Index(f'{ChecklistItem.__tablename__}_value_column_name_id_ix', ChecklistItem.va
 class OrderType(ModifiedAndCreatedColumnMixin, Base):
     r"""The types of orders.
 
+    The combination of `utility_id` and `name` must be unique.
+
     Parameters
     ----------
     order_type_id : int
@@ -1659,24 +1661,34 @@ class OrderType(ModifiedAndCreatedColumnMixin, Base):
     __tablename__ = 'order_type'
 
     order_type_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    utility_id: Mapped[int] = mapped_column(ForeignKey(Utility.utility_id))
+    utility_id: Mapped[int | None] = mapped_column(ForeignKey(Utility.utility_id))
     name: Mapped[str]
     description: Mapped[str | None]
 
     orders: Mapped[list['Order']] = relationship(back_populates='order_type')
 
 
-Index(f'{OrderType.__tablename__}_utility_id_ix', OrderType.utility_id)
-Index(f'{OrderType.__tablename__}_name_ix', OrderType.name)
+Index(
+    f'{OrderType.__tablename__}_utility_id_name_uix',
+    OrderType.utility_id,
+    OrderType.name,
+    unique=True,
+)
 
 
 class OrderStatus(ModifiedAndCreatedColumnMixin, Base):
     r"""The statuses of an order.
 
+    The combination of `utility_id` and `name` must be unique.
+
     Parameters
     ----------
     order_status_id : int
         The unique ID of the order status. The primary key of the table.
+
+    utility_id : int
+        The utility that the order status belongs to. Foreign key to
+        :attr:`Utility.utility_id`. Is indexed.
 
     name : str
         The name of the status. Must be unique. Is indexed.
@@ -1700,6 +1712,7 @@ class OrderStatus(ModifiedAndCreatedColumnMixin, Base):
 
     columns__repr__: ClassVar[tuple[str, ...]] = (
         'order_status_id',
+        'utility_id',
         'name',
         'description',
         'updated_at',
@@ -1711,13 +1724,19 @@ class OrderStatus(ModifiedAndCreatedColumnMixin, Base):
     __tablename__ = 'order_status'
 
     order_status_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    utility_id: Mapped[int | None] = mapped_column(ForeignKey(Utility.utility_id))
     name: Mapped[str]
     description: Mapped[str | None]
 
     orders: Mapped[list['Order']] = relationship(back_populates='order_status')
 
 
-Index(f'{OrderStatus.__tablename__}_name_uix', OrderType.name, unique=True)
+Index(
+    f'{OrderStatus.__tablename__}_utility_id_name_uix',
+    OrderStatus.utility_id,
+    OrderStatus.name,
+    unique=True,
+)
 
 
 class Order(ModifiedAndCreatedColumnMixin, Base):
