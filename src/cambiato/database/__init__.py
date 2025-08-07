@@ -1,6 +1,15 @@
 r"""The database of Cambiato."""
 
 # Local
+from cambiato.database.crud import (
+    get_all_checklists,
+    get_all_facilities,
+    get_all_order_statuses,
+    get_all_order_types,
+    get_all_technicians,
+    get_all_utilities,
+)
+
 from . import models
 from .core import URL, Session, SessionFactory, commit, create_session_factory
 from .init import init
@@ -14,6 +23,13 @@ __all__ = [
     'SessionFactory',
     'commit',
     'create_session_factory',
+    # crud
+    'get_all_checklists',
+    'get_all_facilities',
+    'get_all_order_statuses',
+    'get_all_order_types',
+    'get_all_technicians',
+    'get_all_utilities',
     # init
     'init',
 ]
