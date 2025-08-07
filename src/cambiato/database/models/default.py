@@ -235,41 +235,35 @@ flange_mount_type = MountType(
 )
 
 # OrderType
-el_device_change_order_type = OrderType(
+device_change_order_type = OrderType(
     order_type_id=1,
-    utility_id=el_utility.utility_id,
     name='Device Change',
-    description='An electricity meter change on a facility.',
+    description='A device change on a facility.',
 )
-el_enable_device_order_type = OrderType(
+enable_device_order_type = OrderType(
     order_type_id=2,
-    utility_id=el_utility.utility_id,
     name='Enable Device',
-    description='Enable a new electricity meter on a facility.',
+    description='Enable a new device on a facility.',
 )
-el_disable_device_order_type = OrderType(
+disable_device_order_type = OrderType(
     order_type_id=3,
-    utility_id=el_utility.utility_id,
     name='Disable Device',
-    description='Disable an electricity meter on a facility.',
+    description='Disable a device on a facility.',
 )
-el_comm_point_change_order_type = OrderType(
+comm_point_change_order_type = OrderType(
     order_type_id=4,
-    utility_id=el_utility.utility_id,
     name='Communication Point Change',
     description='Change a communication point.',
 )
-el_manual_reading_order_type = OrderType(
+manual_reading_order_type = OrderType(
     order_type_id=5,
-    utility_id=el_utility.utility_id,
     name='Manual Reading',
-    description='The technician needs to perform a manual reading of an electricity meter.',
+    description='The technician needs to perform a manual reading of a device.',
 )
-el_meter_alarm_order_type = OrderType(
+device_alarm_order_type = OrderType(
     order_type_id=6,
-    utility_id=el_utility.utility_id,
-    name='Meter Alarm',
-    description='The technician needs to investigate an alarm from a meter.',
+    name='Device Alarm',
+    description='The technician needs to investigate an alarm from a device.',
 )
 
 # OrderStatus
@@ -398,12 +392,12 @@ def add_default_models_to_session(session: Session) -> None:
             thread_mount_type,
             flange_mount_type,
             # OrderType
-            el_device_change_order_type,
-            el_enable_device_order_type,
-            el_disable_device_order_type,
-            el_comm_point_change_order_type,
-            el_manual_reading_order_type,
-            el_meter_alarm_order_type,
+            device_change_order_type,
+            enable_device_order_type,
+            disable_device_order_type,
+            comm_point_change_order_type,
+            manual_reading_order_type,
+            device_alarm_order_type,
             # OrderStatus
             to_do_order_status,
             assigned_order_status,

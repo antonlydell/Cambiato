@@ -9,12 +9,12 @@
             "6": {"name": "Completed", "description": "An order that has been fully completed."}
         },
         "order_type": {
-            "1": {"name": "Device Change", "description": "An electricity meter change on a facility."},
-            "2": {"name": "Enable Device", "description": "Enable a new electricity meter on a facility."},
-            "3": {"name": "Disable Device", "description": "Disable an electricity meter on a facility."},
+            "1": {"name": "Device Change", "description": "A device change on a facility."},
+            "2": {"name": "Enable Device", "description": "Enable a new device on a facility."},
+            "3": {"name": "Disable Device", "description": "Disable a device on a facility."},
             "4": {"name": "Communication Point Change", "description": "Change a communication point."},
-            "5": {"name": "Manual Reading", "description": "The technician needs to perform a manual reading of an electricity meter."},
-            "6": {"name": "Meter Alarm", "description": "The technician needs to investigate an alarm from a meter."}
+            "5": {"name": "Manual Reading", "description": "The technician needs to perform a manual reading of a device."},
+            "6": {"name": "Device Alarm", "description": "The technician needs to investigate an alarm from a device."}
         },
         "role": {
             "1": {"name": "Technician", "description": "A technician carries out orders in the field"},
