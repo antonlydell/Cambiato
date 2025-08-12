@@ -48,7 +48,7 @@ def get_all_facilities(
     )
 
     if utility_ids:
-        query = query.where(Facility.facility_id.in_(utility_ids))
+        query = query.where(Facility.utility_id.in_(utility_ids))
 
     df = pd.read_sql_query(  # type: ignore[call-overload]
         sql=query,
