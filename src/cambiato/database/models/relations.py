@@ -7,7 +7,7 @@ from typing import ClassVar
 # Third party
 from sqlalchemy import TIMESTAMP, BigInteger, ForeignKey, Index, false, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from streamlit_passwordless.database.models import Base, ModifiedAndCreatedColumnMixin, User
+from streamlit_passwordless.database.models import Base, ModifiedAndCreatedColumnMixin
 
 # Local
 from .core import (
@@ -18,6 +18,7 @@ from .core import (
     Manufacturer,
     TypeDescription,
     Unit,
+    User,
     Utility,
     ValueColumnName,
 )
@@ -204,6 +205,7 @@ class Location(ModifiedAndCreatedColumnMixin, Base):
     location_type: Mapped[LocationType] = relationship(back_populates='locations')
     coordinate_system: Mapped[CoordinateSystem] = relationship()
     facilities: Mapped[list['Facility']] = relationship(back_populates='location')
+    orders: Mapped[list['Order']] = relationship(back_populates='location')
 
 
 Index(f'{Location.__tablename__}_ext_id_uix', Location.ext_id, unique=True)
@@ -1109,6 +1111,7 @@ class Facility(ModifiedAndCreatedColumnMixin, Base):
     utility: Mapped[Utility] = relationship()
     customer: Mapped[Customer] = relationship(back_populates='facilities')
     location: Mapped[Location] = relationship(back_populates='facilities')
+    orders: Mapped[list['Order']] = relationship(back_populates='facility')
     images: Mapped[list['Image']] = relationship(back_populates='facility')
 
 
@@ -1772,9 +1775,12 @@ class Order(ModifiedAndCreatedColumnMixin, Base):
         The checklist assigned to the order with the tasks the technician needs to carry out.
         Foreign key to :attr:`Checklist.checklist_id`. Is indexed.
 
-    assigned_to : str or None
+    assigned_to_user_id : str or None
         The technician that is assigned to the order. Foreign key to
         :attr:`streamlit_passwordless.User.user_id`. Is indexed.
+
+    description : str or None
+        A description that gives further details about the order to the technician.
 
     scheduled_start_at : datetime or None
         The scheduled start time of the order.
@@ -1816,11 +1822,12 @@ class Order(ModifiedAndCreatedColumnMixin, Base):
         'location_id',
         'customer_id',
         'checklist_id',
-        'assigned_to',
+        'assigned_to_user_id',
+        'description',
         'scheduled_start_at',
         'scheduled_end_at',
         'closing_comment',
-        'completed_by',
+        'completed_by_user_id',
         'completed_at',
         'updated_at',
         'updated_by',
@@ -1834,8 +1841,12 @@ class Order(ModifiedAndCreatedColumnMixin, Base):
     order_type_id: Mapped[int] = mapped_column(ForeignKey(OrderType.order_type_id))
     order_status_id: Mapped[int] = mapped_column(ForeignKey(OrderStatus.order_status_id))
     ext_id: Mapped[str | None]
-    facility_id: Mapped[int | None] = mapped_column(ForeignKey(Facility.facility_id))
-    location_id: Mapped[int | None] = mapped_column(ForeignKey(Location.location_id))
+    facility_id: Mapped[int | None] = mapped_column(
+        ForeignKey(Facility.facility_id, ondelete='SET NULL')
+    )
+    location_id: Mapped[int | None] = mapped_column(
+        ForeignKey(Location.location_id, ondelete='SET NULL')
+    )
     customer_id: Mapped[int | None] = mapped_column(
         ForeignKey(Customer.customer_id, ondelete='SET NULL')
     )
@@ -1844,18 +1855,25 @@ class Order(ModifiedAndCreatedColumnMixin, Base):
     )
 
     assigned_to_user_id: Mapped[str | None] = mapped_column(
-        ForeignKey(User.user_id), onupdate='SET NULL'
+        ForeignKey(User.user_id, ondelete='SET NULL')
     )
+    description: Mapped[str | None]
     scheduled_start_at: Mapped[datetime | None] = mapped_column(TIMESTAMP())
     scheduled_end_at: Mapped[datetime | None] = mapped_column(TIMESTAMP())
     closing_comment: Mapped[str | None]
-    completed_by: Mapped[str | None] = mapped_column(ForeignKey(User.user_id, ondelete='SET NULL'))
+    completed_by_user_id: Mapped[str | None] = mapped_column(
+        ForeignKey(User.user_id, ondelete='SET NULL')
+    )
     completed_at: Mapped[datetime | None] = mapped_column(TIMESTAMP())
 
     order_type: Mapped[OrderType] = relationship(back_populates='orders')
     order_status: Mapped[OrderStatus] = relationship(back_populates='orders')
+    facility: Mapped[Facility] = relationship(back_populates='orders')
+    location: Mapped[Location] = relationship(back_populates='orders')
     checklist: Mapped[Checklist] = relationship(back_populates='orders')
     checklist_items: Mapped[list['OrderChecklistItem']] = relationship(back_populates='order')
+    assigned_to: Mapped[User] = relationship(foreign_keys=assigned_to_user_id)
+    completed_by: Mapped[User] = relationship(foreign_keys=completed_by_user_id)
     enabled_disabled_devices_mr: Mapped[list['OrderEnabledDisabledDeviceMR']] = relationship(
         back_populates='order'
     )
@@ -1872,10 +1890,10 @@ class Order(ModifiedAndCreatedColumnMixin, Base):
 Index(f'{Order.__tablename__}_order_type_id_ix', Order.order_type_id)
 Index(f'{Order.__tablename__}_order_status_id_ix', Order.order_status_id)
 Index(f'{Order.__tablename__}_facility_id_ix', Order.facility_id)
-Index(f'{Order.__tablename__}_location_id_ix', Order.location_id)
 Index(f'{Order.__tablename__}_customer_id_ix', Order.customer_id)
 Index(f'{Order.__tablename__}_checklist_id_ix', Order.checklist_id)
 Index(f'{Order.__tablename__}_assigned_to_user_id_ix', Order.assigned_to_user_id)
+Index(f'{Order.__tablename__}_completed_by_user_id_ix', Order.completed_by_user_id)
 
 
 class OrderEnabledDisabledDeviceMR(ModifiedAndCreatedColumnMixin, Base):
