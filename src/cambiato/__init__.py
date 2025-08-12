@@ -34,6 +34,7 @@ from cambiato.config import (
     StreamLogHandler,
     load_config,
 )
+from cambiato.core import OperationResult
 from cambiato.exceptions import (
     CambiatoError,
     ConfigError,
@@ -81,6 +82,8 @@ __all__ = [
     'Stream',
     'StreamLogHandler',
     'load_config',
+    # core
+    'OperationResult',
     # database
     'db',
     # exceptions
