@@ -8,6 +8,11 @@ from typing import ClassVar
 from sqlalchemy import ForeignKey, Index, MetaData
 from sqlalchemy.orm import Mapped, mapped_column
 from streamlit_passwordless.database.models import Base, ModifiedAndCreatedColumnMixin
+from streamlit_passwordless.database.models import CustomRole as CustomRole
+from streamlit_passwordless.database.models import Email as Email
+from streamlit_passwordless.database.models import Role as Role
+from streamlit_passwordless.database.models import User as User
+from streamlit_passwordless.database.models import UserSignIn as UserSignIn
 
 SCHEMA: str | None = os.getenv('CAMBIATO_DB_SCHEMA')
 metadata_obj = MetaData(schema=SCHEMA)
