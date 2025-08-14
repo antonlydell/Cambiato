@@ -5,11 +5,11 @@ from collections.abc import Sequence
 
 # Third party
 import pandas as pd
-from sqlalchemy import select
+from sqlalchemy import or_, select
 
 # Local
 from cambiato.database.core import Session
-from cambiato.database.models import Checklist, OrderType
+from cambiato.database.models import Checklist
 from cambiato.models.dataframe import ChecklistDataFrameModel
 
 
@@ -40,7 +40,9 @@ def get_all_checklists(
     ).order_by(Checklist.checklist_id)
 
     if utility_ids:
-        query = query.where(OrderType.utility_id.in_(utility_ids))
+        query = query.where(
+            or_(Checklist.utility_id.in_(utility_ids), Checklist.utility_id.is_(None))
+        )
 
     df = pd.read_sql_query(
         sql=query,
