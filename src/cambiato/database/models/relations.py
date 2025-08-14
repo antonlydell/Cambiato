@@ -1484,7 +1484,7 @@ class Checklist(ModifiedAndCreatedColumnMixin, Base):
     checklist_id : int
         The unique ID of the checklist. The primary key of the table.
 
-    utility_id : int
+    utility_id : int or None
         The ID of the utility the checklist belongs to. Foreign key to
         :attr:`Utility.utility_id`. Is indexed.
 
@@ -1522,15 +1522,21 @@ class Checklist(ModifiedAndCreatedColumnMixin, Base):
     __tablename__ = 'checklist'
 
     checklist_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    utility_id: Mapped[int] = mapped_column(ForeignKey(Utility.utility_id))
+    utility_id: Mapped[int | None] = mapped_column(ForeignKey(Utility.utility_id))
     name: Mapped[str]
     description: Mapped[str | None]
 
+    utility: Mapped[Utility] = relationship()
     checklist_items: Mapped[list['ChecklistItem']] = relationship(back_populates='checklist')
     orders: Mapped[list['Order']] = relationship(back_populates='checklist')
 
 
-Index(f'{Checklist.__tablename__}_utility_id_ix', Checklist.utility_id)
+Index(
+    f'{Checklist.__tablename__}_utility_id_name_uix',
+    Checklist.utility_id,
+    Checklist.name,
+    unique=True,
+)
 
 
 class ChecklistItem(ModifiedAndCreatedColumnMixin, Base):
@@ -1626,7 +1632,7 @@ class OrderType(ModifiedAndCreatedColumnMixin, Base):
     order_type_id : int
         The unique ID of the order type. The primary key of the table.
 
-    utility_id : int
+    utility_id : int or None
         The utility that the order type belongs to. Foreign key to
         :attr:`Utility.utility_id`. Is indexed.
 
@@ -1668,6 +1674,7 @@ class OrderType(ModifiedAndCreatedColumnMixin, Base):
     name: Mapped[str]
     description: Mapped[str | None]
 
+    utility: Mapped[Utility] = relationship()
     orders: Mapped[list['Order']] = relationship(back_populates='order_type')
 
 
@@ -1689,7 +1696,7 @@ class OrderStatus(ModifiedAndCreatedColumnMixin, Base):
     order_status_id : int
         The unique ID of the order status. The primary key of the table.
 
-    utility_id : int
+    utility_id : int or None
         The utility that the order status belongs to. Foreign key to
         :attr:`Utility.utility_id`. Is indexed.
 
@@ -1731,6 +1738,7 @@ class OrderStatus(ModifiedAndCreatedColumnMixin, Base):
     name: Mapped[str]
     description: Mapped[str | None]
 
+    utility: Mapped[Utility] = relationship()
     orders: Mapped[list['Order']] = relationship(back_populates='order_status')
 
 
