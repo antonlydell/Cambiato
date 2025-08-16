@@ -2,6 +2,7 @@ r"""The database of Cambiato."""
 
 # Local
 from cambiato.database.crud import (
+    create_order,
     get_all_checklists,
     get_all_facilities,
     get_all_order_statuses,
@@ -24,6 +25,7 @@ __all__ = [
     'commit',
     'create_session_factory',
     # crud
+    'create_order',
     'get_all_checklists',
     'get_all_facilities',
     'get_all_order_statuses',
