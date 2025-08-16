@@ -9,7 +9,7 @@ import streamlit_passwordless as stp
 
 # Local
 from cambiato import exceptions
-from cambiato.app.config import ICON_ERROR
+from cambiato.app.components.icons import ICON_ERROR
 from cambiato.config import load_config
 from cambiato.database import create_session_factory
 from cambiato.log import setup_logging
