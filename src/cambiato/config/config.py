@@ -5,9 +5,11 @@ import os
 import sys
 import tomllib
 from pathlib import Path
+from typing import Any, cast
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 # Third party
-from pydantic import AliasChoices, ConfigDict, Field
+from pydantic import AliasChoices, ConfigDict, Field, field_validator
 
 # Local
 from cambiato import exceptions
@@ -32,6 +34,9 @@ class ConfigManager(BaseConfigModel):
         The special path '-' specifies that the config was loaded from stdin.
         If None the default configuration was loaded.
 
+    timezone : zoneinfo.ZoneInfo, default zoneinfo.ZoneInfo('Europe/Stockholm')
+        The timezone where the application is used.
+
     languages : tuple[cambiato.Language, ...], default (cambiato.Language.EN,)
         The languages to make available to the application. The default is English.
 
@@ -51,6 +56,7 @@ class ConfigManager(BaseConfigModel):
     model_config = ConfigDict(frozen=True)
 
     config_file_path: Path | None = None
+    timezone: ZoneInfo = Field(default=cast(ZoneInfo, None), validate_default=True)
     languages: tuple[Language, ...] = (Language.EN,)
     default_language: Language = Language.EN
     database: DatabaseConfig = Field(default_factory=DatabaseConfig)
@@ -58,6 +64,35 @@ class ConfigManager(BaseConfigModel):
         validation_alias=AliasChoices('bwp', 'bitwarden_passwordless', 'bitwarden_passwordless_dev')
     )
     logging: LoggingConfig = Field(default_factory=LoggingConfig)
+
+    @field_validator('timezone', mode='before')
+    @classmethod
+    def validate_timezone(cls, v: Any) -> ZoneInfo:
+        r"""Validate the timezone field and set the default value."""
+
+        if isinstance(v, ZoneInfo):
+            return v
+
+        default = 'Europe/Stockholm'
+
+        if v is None:
+            key = default
+        elif isinstance(v, str):
+            key = v.strip() or default
+        else:
+            raise ValueError(
+                f'Invalid timezone: "{v}". '
+                f'Expected str or zoneinfo.ZoneInfo, got "{type(v).__name__}".'
+            )
+
+        try:
+            return ZoneInfo(key)
+        except ZoneInfoNotFoundError:
+            raise ValueError(
+                f'Failed to load timezone "{key}". Either the IANA timezone key is invalid '
+                'or the system timezone database is missing. Install the tzdata package '
+                'for your system or provide a valid timezone like "Europe/Stockholm".'
+            ) from None
 
 
 def _load_config_from_stdin() -> str:

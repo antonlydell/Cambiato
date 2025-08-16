@@ -2,14 +2,142 @@ r"""Unit tests for the module config.config."""
 
 # Standard library
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
+from zoneinfo import ZoneInfo
 
 # Third party
 import pytest
 
 # Local
 from cambiato import exceptions
-from cambiato.config import load_config
+from cambiato.config import ConfigManager, load_config
+
+
+class TestConfigManagerTimezone:
+    r"""Tests for timezone field of `cambiato.config.ConfigManager`."""
+
+    bwp: ClassVar[dict[str, str]] = {
+        'public_key': 'bwp_public_key',
+        'private_key': 'bwp_private_key',
+    }
+
+    default_tz: ClassVar[ZoneInfo] = ZoneInfo('Europe/Stockholm')
+
+    def test_default_value(self) -> None:
+        r"""Test the default value of the timezone field."""
+
+        # Setup - None
+        # ===========================================================
+
+        # Exercise
+        # ===========================================================
+        cm = ConfigManager(bwp=self.bwp)
+
+        # Verify
+        # ===========================================================
+        assert cm.timezone == self.default_tz
+
+        # Clean up - None
+        # ===========================================================
+
+    @pytest.mark.parametrize(
+        'timezone',
+        [
+            pytest.param(None, id='None'),
+            pytest.param('', id='""'),
+            pytest.param('    ', id='spaces'),
+        ],
+    )
+    def test_empty_values(self, timezone: str | None) -> None:
+        r"""Test empty values such as None and "", which should yield the default timezone."""
+
+        # Setup - None
+        # ===========================================================
+
+        # Exercise
+        # ===========================================================
+        cm = ConfigManager(timezone=timezone, bwp=self.bwp)
+
+        # Verify
+        # ===========================================================
+        assert cm.timezone == self.default_tz
+
+        # Clean up - None
+        # ===========================================================
+
+    @pytest.mark.parametrize(
+        ('timezone', 'exp_timezone'),
+        [
+            pytest.param('Europe/Berlin', ZoneInfo('Europe/Berlin'), id='str'),
+            pytest.param(ZoneInfo('America/Denver'), ZoneInfo('America/Denver'), id='ZoneInfo'),
+        ],
+    )
+    def test_valid_timezone(self, timezone: str | ZoneInfo, exp_timezone: ZoneInfo) -> None:
+        r"""Test to supply a valid timezone."""
+
+        # Setup - None
+        # ===========================================================
+
+        # Exercise
+        # ===========================================================
+        cm = ConfigManager(timezone=timezone, bwp=self.bwp)
+
+        # Verify
+        # ===========================================================
+        assert cm.timezone == exp_timezone
+
+        # Clean up - None
+        # ===========================================================
+
+    @pytest.mark.raises
+    def test_invalid_timezone(self) -> None:
+        r"""Test to to supply an invalid timezone."""
+
+        # Setup
+        # ===========================================================
+        error_msg_exp = (
+            'Failed to load timezone "invalid". Either the IANA timezone key is invalid '
+            'or the system timezone database is missing. Install the tzdata package '
+            'for your system or provide a valid timezone like "Europe/Stockholm".'
+        )
+
+        # Exercise
+        # ===========================================================
+        with pytest.raises(exceptions.ConfigError) as exc_info:
+            ConfigManager(timezone='invalid', bwp=self.bwp)
+
+        # Verify
+        # ===========================================================
+        error_msg = exc_info.value.args[0]
+        print(error_msg)
+
+        assert error_msg_exp in error_msg
+
+        # Clean up - None
+        # ===========================================================
+
+    @pytest.mark.raises
+    def test_unsupported_type(self) -> None:
+        r"""Test to to supply an unsupported type."""
+
+        # Setup
+        # ===========================================================
+        error_msg_exp = 'Invalid timezone: "[]". Expected str or zoneinfo.ZoneInfo, got "list".'
+
+        # Exercise
+        # ===========================================================
+        with pytest.raises(exceptions.ConfigError) as exc_info:
+            ConfigManager(timezone=[], bwp=self.bwp)
+
+        # Verify
+        # ===========================================================
+        error_msg = exc_info.value.args[0]
+        print(error_msg)
+
+        assert error_msg_exp in error_msg
+
+        # Clean up - None
+        # ===========================================================
 
 
 class TestLoadConfig:

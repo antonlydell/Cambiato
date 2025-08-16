@@ -5,6 +5,7 @@ import io
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
 # Third party
 import pytest
@@ -111,6 +112,7 @@ def config_data(tmp_path: Path) -> tuple[str, dict[str, Any]]:
     }
 
     config_exp = {
+        'timezone': ZoneInfo('Europe/Stockholm'),
         'languages': (Language.EN,),
         'default_language': Language.EN,
         'database': database_config,
