@@ -1,7 +1,7 @@
 r"""The core data models of Cambiato."""
 
 # Standard library
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from typing import Any, ClassVar, TypeAlias
 
 # Third party
@@ -107,3 +107,12 @@ class BaseDataFrameModel(BaseModel):
         """
 
         return str(id_)
+
+    @property
+    def format_func(self) -> Callable[[int | str], str]:
+        r"""A function to format a row of the DataFrame as a string.
+
+        The function takes an index ID of the DataFrame and displays its row as a string.
+        """
+
+        return lambda x: self.display_row(x)
