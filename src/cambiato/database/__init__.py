@@ -9,6 +9,7 @@ from cambiato.database.crud import (
     get_all_order_types,
     get_all_technicians,
     get_all_utilities,
+    get_customer_id_by_facility_id,
 )
 
 from . import models
@@ -32,6 +33,7 @@ __all__ = [
     'get_all_order_types',
     'get_all_technicians',
     'get_all_utilities',
+    'get_customer_id_by_facility_id',
     # init
     'init',
 ]

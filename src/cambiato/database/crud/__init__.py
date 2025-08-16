@@ -2,6 +2,7 @@ r"""Functions to perform CREATE, UPDATE and DELETE operations on the database.""
 
 # Local
 from .checklist import get_all_checklists
+from .customer import get_customer_id_by_facility_id
 from .facility import get_all_facilities
 from .order import create_order, get_all_order_statuses, get_all_order_types
 from .user import get_all_technicians
@@ -16,4 +17,5 @@ __all__ = [
     'get_all_order_types',
     'get_all_technicians',
     'get_all_utilities',
+    'get_customer_id_by_facility_id',
 ]
