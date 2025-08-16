@@ -11,3 +11,5 @@ CREATE_ORDER_FORM_DESCRIPTION_TEXT_AREA = 'create-order-form-description-text-ar
 CREATE_ORDER_FORM_SCHEDULED_DAY_DATE_INPUT = 'create-order-form-scheduled-day-date-input'
 CREATE_ORDER_FORM_SCHEDULED_START_TIME_INPUT = 'create-order-form-scheduled-start-time-input'
 CREATE_ORDER_FORM_SCHEDULED_END_TIME_INPUT = 'create-order-form-scheduled-end-time-input'
+
+UTILITY_PILLS_SELECTOR = 'utility-pills-selector'
