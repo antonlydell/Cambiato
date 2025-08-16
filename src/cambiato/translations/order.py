@@ -31,10 +31,14 @@ class CreateOrderForm(BaseModel):
     checklist_id_placeholder: str
     technician_id_label: str
     technician_id_placeholder: str
+    description_label: str
+    description_placeholder: str
     scheduled_date: str
     scheduled_start_at: str
     scheduled_end_at: str
     submit_button_label: str
+    success_message: str
+    error_message: str
     validation_messages: CreateOrderFormValidationMessage
 
 

@@ -1,8 +1,9 @@
 r"""The create order form component."""
 
 # Standard library
-from collections.abc import Sequence
+from datetime import UTC, date, datetime, time
 from enum import StrEnum
+from zoneinfo import ZoneInfo
 
 # Third party
 import streamlit as st
@@ -10,16 +11,18 @@ import streamlit as st
 # Local
 from cambiato.app.components import keys
 from cambiato.app.components.core import BannerContainerMapping, process_form_validation_errors
+from cambiato.app.components.icons import ICON_ERROR, ICON_SUCCESS
 from cambiato.app.session_state import CREATE_ORDER_FORM_VALIDATION_ERRORS
-from cambiato.database import Session
+from cambiato.database import Session, create_order, get_customer_id_by_facility_id
 from cambiato.database.models import (
-    Checklist,
-    Facility,
-    Location,
     Order,
-    OrderStatus,
-    OrderType,
-    User,
+)
+from cambiato.models.dataframe import (
+    ChecklistDataFrameModel,
+    FacilityDataFrameModel,
+    OrderStatusDataFrameModel,
+    OrderTypeDataFrameModel,
+    UserDataFrameModel,
 )
 from cambiato.translations import CreateOrderForm, CreateOrderFormValidationMessage
 
@@ -65,15 +68,63 @@ def _validate_form(translation: CreateOrderFormValidationMessage) -> None:
     st.session_state[CREATE_ORDER_FORM_VALIDATION_ERRORS] = validation_errors
 
 
+def _create_scheduled_timestamps(
+    day: date | None, start_time: time | None, end_time: time | None, tz: ZoneInfo
+) -> tuple[datetime | None, datetime | None]:
+    r"""Create the scheduled at interval.
+
+    Parameters
+    ----------
+    day : datetime.date or None
+        The date that the order is scheduled at. If None the order is not scheduled.
+
+    start_time : datetime.time or None
+        The time of `day` when the technician is expected to start working on the order.
+        If None there is no specified start time.
+
+    end_time : datetime.time or None
+        The time of `day` when the order is expected to be completed.
+        If None there is no end time.
+
+    tz : zoneinfo.ZoneInfo
+        The timezone in which `day`, `start_time` and `end_time` are specified.
+
+    Returns
+    -------
+    start_datetime : datetime.datetime or None
+        The scheduled start time. None if the order is not scheduled.
+
+    end_datetime : datetime.datetime or None
+        The scheduled end time. None if the end time is not scheduled.
+    """
+
+    if day:
+        if start_time:
+            start_datetime = datetime.combine(date=day, time=start_time, tzinfo=tz).astimezone(UTC)
+        else:
+            start_datetime = datetime.combine(date=day, time=time(0, 0), tzinfo=tz).astimezone(UTC)
+
+        if end_time:
+            end_datetime = datetime.combine(date=day, time=end_time, tzinfo=tz).astimezone(UTC)
+        else:
+            end_datetime = None
+    else:
+        start_datetime = None
+        end_datetime = None
+
+    return start_datetime, end_datetime
+
+
 def create_order_form(
     session: Session,
-    order_types: Sequence[OrderType],
-    order_statuses: Sequence[OrderStatus],
-    facilities: Sequence[Facility],
-    locations: Sequence[Location],
-    checklists: Sequence[Checklist],
-    technicians: Sequence[User],
+    order_types: OrderTypeDataFrameModel,
+    order_statuses: OrderStatusDataFrameModel,
+    facilities: FacilityDataFrameModel,
+    checklists: ChecklistDataFrameModel,
+    technicians: UserDataFrameModel,
     translation: CreateOrderForm,
+    tz: ZoneInfo,
+    user_id: str | None = None,
     border: bool = True,
     title: bool = True,
     key: str = keys.CREATE_ORDER_FORM,
@@ -85,26 +136,29 @@ def create_order_form(
     session : cambiato.db.Session
         An active database session.
 
-    order_types : Sequence[cambiato.db.models.OrderType]
+    order_types : cambiato.models.OrderTypeDataFrameModel
         The selectable order types of the order to create.
 
-    order_statuses : Sequence[cambiato.db.models.OrderStatus]
+    order_statuses : cambiato.models.OrderStatusDataFrameModel
         The selectable order statuses of the order to create.
 
-    facilities : Sequence[cambiato.db.models.Facility]
+    facilities : cambiato.models.FacilityDataFrameModel
         The selectable facilities that can be assigned to the order.
 
-    locations : Sequence[cambiato.db.models.Location]
-        The selectable locations that can be assigned to the order.
-
-    checklists : Sequence[cambiato.db.models.Checklist]
+    checklists : cambiato.models.ChecklistDataFrameModel
         The selectable checklists that can be assigned to the order.
 
-    technicians : Sequence[cambiato.db.models.User]
+    technicians : cambiato.models.UserDataFrameModel
         The selectable technicians that can be assigned to the order.
 
-    translation : cambiato.app.translations.CreateOrderForm
+    translation : cambiato.translations.CreateOrderForm
         The language translations for the form.
+
+    tz : zoneinfo.ZoneInfo
+        The timezone of the entered datetime values of the form.
+
+    user_id : str or None, default None
+        The ID of the user that is creating the order.
 
     border : bool, default True
         True if a border should be rendered around the form and False for no border.
@@ -120,45 +174,42 @@ def create_order_form(
     banner_container_mapping: BannerContainerMapping = {}
 
     with st.form(key=key, border=border):
+        banner_container = st.empty()
         if title:
             st.markdown(f'### {translation.title}')
 
         order_type_id = st.selectbox(
             label=translation.order_type_id_label,
             placeholder=translation.order_type_id_placeholder,
-            options=order_types,
-            disabled=not bool(order_types),
+            options=order_types.index,
+            format_func=order_types.format_func,
+            disabled=order_types.empty,
             key=keys.CREATE_ORDER_FORM_ORDER_TYPE_SELECTBOX,
         )
         order_status_id = st.selectbox(
             label=translation.order_status_id_label,
             placeholder=translation.order_status_id_placeholder,
-            options=order_statuses,
-            disabled=not bool(order_statuses),
+            options=order_statuses.index,
+            format_func=order_statuses.format_func,
+            disabled=order_statuses.empty,
             key=keys.CREATE_ORDER_FORM_ORDER_STATUS_SELECTBOX,
         )
         facility_id = st.selectbox(
             label=translation.facility_id_label,
             placeholder=translation.facility_id_placeholder,
-            options=facilities,
+            options=facilities.index,
+            format_func=facilities.format_func,
             index=None,
-            disabled=not bool(facilities),
+            disabled=facilities.empty,
             key=keys.CREATE_ORDER_FORM_FACILITY_SELECTBOX,
-        )
-        location_id = st.selectbox(
-            label=translation.location_id_label,
-            placeholder=translation.location_id_placeholder,
-            options=locations,
-            index=None,
-            disabled=not bool(locations),
-            key=keys.CREATE_ORDER_FORM_LOCATION_SELECTBOX,
         )
         checklist_id = st.selectbox(
             label=translation.checklist_id_label,
             placeholder=translation.checklist_id_placeholder,
-            options=checklists,
+            options=checklists.index,
             index=None,
-            disabled=not bool(checklists),
+            format_func=checklists.format_func,
+            disabled=checklists.empty,
             key=keys.CREATE_ORDER_FORM_CHECKLIST_SELECTBOX,
         )
         ext_id = st.text_input(
@@ -169,15 +220,21 @@ def create_order_form(
         technician_id = st.selectbox(
             label=translation.technician_id_label,
             placeholder=translation.technician_id_placeholder,
-            options=technicians,
+            options=technicians.index,
+            format_func=technicians.format_func,
             index=None,
-            disabled=not bool(technicians),
+            disabled=technicians.empty,
             key=keys.CREATE_ORDER_FORM_TECHNICIAN_SELECTBOX,
+        )
+        description = st.text_area(
+            label=translation.description_label,
+            placeholder=translation.description_placeholder,
+            key=keys.CREATE_ORDER_FORM_DESCRIPTION_TEXT_AREA,
         )
 
         left_col, mid_col, right_col = st.columns(3)
         with left_col:
-            scheduled_start_at = st.date_input(
+            scheduled_day = st.date_input(
                 label=translation.scheduled_date,
                 value=None,
                 format='YYYY-MM-DD',
@@ -185,7 +242,7 @@ def create_order_form(
             )
         with mid_col:
             banner_container_mapping[FormField.SCHEDULED_START_TIME] = st.empty()
-            scheduled_start_at_time = st.time_input(
+            scheduled_start_time = st.time_input(
                 label=translation.scheduled_start_at,
                 value=None,
                 key=keys.CREATE_ORDER_FORM_SCHEDULED_START_TIME_INPUT,
@@ -198,9 +255,12 @@ def create_order_form(
                 key=keys.CREATE_ORDER_FORM_SCHEDULED_END_TIME_INPUT,
             )
 
+        disabled = order_types.empty or order_statuses.empty or facilities.empty
+
         clicked = st.form_submit_button(
             label=translation.submit_button_label,
             type='primary',
+            disabled=disabled,
             on_click=_validate_form,
             kwargs={'translation': translation.validation_messages},
         )
@@ -217,4 +277,39 @@ def create_order_form(
 
             return None
 
-        return None
+        start_datetime, end_datetime = _create_scheduled_timestamps(
+            day=scheduled_day,
+            start_time=scheduled_start_time,
+            end_time=scheduled_end_time,
+            tz=tz,
+        )
+
+        if facility_id:
+            customer_id = get_customer_id_by_facility_id(session=session, facility_id=facility_id)
+        else:
+            customer_id = None
+
+        order = Order(
+            order_type_id=order_type_id,
+            order_status_id=order_status_id,
+            ext_id=ext_id.strip() if ext_id else ext_id,
+            facility_id=facility_id,
+            customer_id=customer_id,
+            checklist_id=checklist_id,
+            assigned_to_user_id=technician_id,
+            description=description.strip() if description else description,
+            scheduled_start_at=start_datetime,
+            scheduled_end_at=end_datetime,
+            created_by=user_id,
+        )
+
+        result = create_order(session=session, order=order)
+
+        if result.ok:
+            banner_container.success(
+                translation.success_message.format(order_id=order.order_id), icon=ICON_SUCCESS
+            )
+        else:
+            banner_container.error(translation.error_message, icon=ICON_ERROR)
+
+        return order
