@@ -3,6 +3,9 @@ r"""The core functionality of the package."""
 # Standard library
 from typing import NamedTuple
 
+# Third party
+from streamlit_passwordless import get_current_user as get_current_user
+
 
 class OperationResult(NamedTuple):
     r"""The result of a function or method call.
