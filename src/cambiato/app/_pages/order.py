@@ -16,6 +16,7 @@ from cambiato.app.config import (
 )
 from cambiato.app.controller.order import controller
 from cambiato.app.setup import cm, session_factory, translations
+from cambiato.core import get_current_user
 
 ORDER_PAGE_PATH = Path(__file__)
 
@@ -42,9 +43,16 @@ def order_page() -> None:
     )
 
     translation = translations[cm.default_language]
+    user = get_current_user()
 
     with session_factory() as session:
-        controller(session=session, translation=translation.order)
+        controller(
+            session=session,
+            order_translation=translation.order,
+            db_translation=translation.database,
+            tz=cm.timezone,
+            user_id=user.user_id if user else None,
+        )
 
 
 if __name__ in {'__main__', '__page__'}:
