@@ -1,5 +1,7 @@
 r"""The keys of the components of the app."""
 
+CREATE_ORDER_BUTTON = 'create-order-button'
+
 CREATE_ORDER_FORM = 'create-order-form'
 CREATE_ORDER_FORM_ORDER_TYPE_SELECTBOX = 'create-order-form-order-type-selectbox'
 CREATE_ORDER_FORM_ORDER_STATUS_SELECTBOX = 'create-order-form-order-status-selectbox'

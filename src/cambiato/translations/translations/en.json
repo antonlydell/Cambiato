@@ -60,6 +60,7 @@
                 "end_time_no_start_time": "End time must be specified if start time is!",
                 "start_time_geq_end_time": "start time ({start_time}) must be < end time ({end_time})!"
             }
-        }
+        },
+        "create_order_button" : {"label": "Create order"}
     }
 }

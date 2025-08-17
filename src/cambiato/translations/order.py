@@ -4,6 +4,13 @@ r"""The translation models for the order page."""
 from cambiato.models.core import BaseModel
 
 
+class CreateOrderButton(BaseModel):
+    r"""The translation of the create order button."""
+
+    label: str
+    help_text: str | None = None
+
+
 class CreateOrderFormValidationMessage(BaseModel):
     r"""Validation messages for the create order form."""
 
@@ -47,3 +54,4 @@ class Order(BaseModel):
 
     page_title: str
     create_order_form: CreateOrderForm
+    create_order_button: CreateOrderButton
