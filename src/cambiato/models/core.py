@@ -1,8 +1,8 @@
 r"""The core data models of Cambiato."""
 
 # Standard library
-from collections.abc import Callable, Mapping
 from typing import Any, ClassVar, TypeAlias
+from collections.abc import Callable, Mapping, Sequence
 
 # Third party
 import pandas as pd
@@ -116,3 +116,65 @@ class BaseDataFrameModel(BaseModel):
         """
 
         return lambda x: self.display_row(x)
+
+    def localize_and_convert_timezone(
+        self,
+        df: pd.DataFrame | None = None,
+        location_tz: str = 'UTC',
+        target_tz: str | None = None,
+        ensure_datetime_cols: Sequence[str] | None = None,
+        copy: bool = False,
+    ) -> pd.DataFrame:
+        r"""Localize datetime columns and optionally convert them to timezone `target_tz`.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame or None, default None
+            The DataFrame subject to the timezone operations.
+            If None the underlying DataFrame of the model is used.
+
+        location_tz : str, default 'UTC'
+            The timezone to localize naive datetime columns into.
+
+        target_tz : str or None, default None
+            The timezone to convert localized datetimes columns into.
+            If None, only localization is applied.
+
+        ensure_datetime_cols : Sequence[str] or None, default None
+            A sequence of columns that may need to be converted to the datetime datatype.
+            If a datetime column has all missing values it may be of datatype string and
+            thus needs conversion to datetime before localization/timezone conversion.
+
+        copy : bool, default False
+            True if the operation should be performed on a copy of the underlying DataFrame.
+            If False the DataFrame of the model is modified inplace.
+
+        Returns
+        -------
+        df : pandas.DataFrame
+            The DataFrame with its datetime columns localized/converted.
+        """
+
+        df = (self.df.copy() if copy else self.df) if df is None else (df.copy() if copy else df)
+
+        datetime_cols = set(df.select_dtypes(include=['datetime64[ns]']).columns)
+
+        if ensure_datetime_cols:
+            cols_to_process = datetime_cols.union(set(ensure_datetime_cols))
+        else:
+            cols_to_process = datetime_cols
+
+        for col in cols_to_process:
+            if col in datetime_cols:
+                s = df[col]
+            else:
+                s = pd.to_datetime(df[col]).astype('timestamp[ns][pyarrow]')
+
+            if s.dt.tz is None:
+                s = s.dt.tz_localize(location_tz)
+            if target_tz is not None:
+                s = s.dt.tz_convert(target_tz)
+
+            df[col] = s
+
+        return df
