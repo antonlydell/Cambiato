@@ -1767,6 +1767,10 @@ class Order(ModifiedAndCreatedColumnMixin, Base):
     ext_id : str or None
         The unique reference ID to the order in an external system. Is indexed.
 
+    utility_id : int
+        The utility that the order belongs to. Foreign key to
+        :attr:`Utility.utility_id`. Is indexed.
+
     facility_id : int or None
         The facility the order is targeting. Foreign key to :attr:`Facility.facility_id`.
         Is indexed.
@@ -1826,6 +1830,7 @@ class Order(ModifiedAndCreatedColumnMixin, Base):
         'order_type_id',
         'order_status_id',
         'ext_id',
+        'utility_id',
         'facility_id',
         'location_id',
         'customer_id',
@@ -1849,6 +1854,7 @@ class Order(ModifiedAndCreatedColumnMixin, Base):
     order_type_id: Mapped[int] = mapped_column(ForeignKey(OrderType.order_type_id))
     order_status_id: Mapped[int] = mapped_column(ForeignKey(OrderStatus.order_status_id))
     ext_id: Mapped[str | None]
+    utility_id: Mapped[int] = mapped_column(ForeignKey(Utility.utility_id, ondelete='SET NULL'))
     facility_id: Mapped[int | None] = mapped_column(
         ForeignKey(Facility.facility_id, ondelete='SET NULL')
     )
@@ -1876,6 +1882,7 @@ class Order(ModifiedAndCreatedColumnMixin, Base):
 
     order_type: Mapped[OrderType] = relationship(back_populates='orders')
     order_status: Mapped[OrderStatus] = relationship(back_populates='orders')
+    utility: Mapped[Utility] = relationship()
     facility: Mapped[Facility] = relationship(back_populates='orders')
     location: Mapped[Location] = relationship(back_populates='orders')
     checklist: Mapped[Checklist] = relationship(back_populates='orders')
@@ -1897,6 +1904,7 @@ class Order(ModifiedAndCreatedColumnMixin, Base):
 
 Index(f'{Order.__tablename__}_order_type_id_ix', Order.order_type_id)
 Index(f'{Order.__tablename__}_order_status_id_ix', Order.order_status_id)
+Index(f'{Order.__tablename__}_utility_id_ix', Order.utility_id)
 Index(f'{Order.__tablename__}_facility_id_ix', Order.facility_id)
 Index(f'{Order.__tablename__}_customer_id_ix', Order.customer_id)
 Index(f'{Order.__tablename__}_checklist_id_ix', Order.checklist_id)
