@@ -1,6 +1,7 @@
 r"""Unit tests for the module translations.core."""
 
 # Standard library
+from collections.abc import Sequence
 from typing import TypeAlias
 
 # Third party
@@ -9,6 +10,7 @@ import pytest
 from pandas.testing import assert_frame_equal
 
 # Local
+from cambiato import exceptions
 from cambiato.config import Language
 from cambiato.translations.core import (
     TranslationModel,
@@ -33,7 +35,7 @@ def df_translation() -> tuple[pd.DataFrame, TranslationMapping, pd.DataFrame]:
     translation : dict[int, dict[str, str]]
         The translations for the columns of `df`.
 
-    df_trans : pandas.DataFrame
+    df_translated : pandas.DataFrame
         The translated DataFrame.
     """
 
@@ -42,6 +44,7 @@ def df_translation() -> tuple[pd.DataFrame, TranslationMapping, pd.DataFrame]:
     df = pd.DataFrame(
         index=index, data={'name': ['lumb', 'fally'], 'description': [None, 'Ciudad Blanca']}
     )
+    df.index.name = 'rs_id'
 
     translation = {
         1: {'name': 'Lumbridge', 'description': 'The town by the river'},
@@ -55,8 +58,61 @@ def df_translation() -> tuple[pd.DataFrame, TranslationMapping, pd.DataFrame]:
             'description': ['The town by the river', 'The white city.'],
         },
     )
+    df_translated.index.name = 'rs_id'
 
     return df, translation, df_translated
+
+
+@pytest.fixture
+def df_multi_translation() -> tuple[
+    pd.DataFrame, tuple[TranslationMapping, TranslationMapping], pd.DataFrame
+]:
+    r"""A translated DataFrame with two translation mappings applied.
+
+    Returns
+    -------
+    df : pandas.DataFrame
+        The DataFrame to translate.
+
+    translations : tuple[dict[int, dict[str, str]]
+        The translations for the columns of `df`.
+
+    df_translated : pandas.DataFrame
+        The translated DataFrame.
+    """
+
+    index = (1, 2)
+
+    df = pd.DataFrame(
+        index=index,
+        data={
+            'name': ['lumb', 'fally'],
+            'description': [None, 'Ciudad Blanca'],
+            'tool_id': [8, 9],
+            'tool': ['axe', 'tbox'],
+        },
+    )
+    df.index.name = 'rs_id'
+
+    name_desc_trans = {
+        1: {'name': 'Lumbridge', 'description': 'The town by the river'},
+        2: {'name': 'Falador', 'description': 'The white city.'},
+    }
+    tool_trans = {8: {'name': 'Axe'}, 9: {'name': 'Tinderbox'}}
+    translations = (name_desc_trans, tool_trans)
+
+    df_translated = pd.DataFrame(
+        index=index,
+        data={
+            'name': ['Lumbridge', 'Falador'],
+            'description': ['The town by the river', 'The white city.'],
+            'tool_id': [8, 9],
+            'tool': ['Axe', 'Tinderbox'],
+        },
+    )
+    df_translated.index.name = 'rs_id'
+
+    return df, translations, df_translated
 
 
 class TestLoadTranslation:
@@ -162,7 +218,7 @@ class TestTranslateDataFrame:
         # Clean up - None
         # ===========================================================
 
-    def test_some_rows_of_of_df_have_translation_records(
+    def test_some_rows_of_df_have_translation_records(
         self, df_translation: tuple[pd.DataFrame, TranslationMapping, pd.DataFrame]
     ) -> None:
         r"""Test to translate a DataFrame where some rows have a translation record."""
@@ -177,7 +233,9 @@ class TestTranslateDataFrame:
         # Exercise
         # ===========================================================
         df_result = translate_dataframe(
-            df=df, translation={k: v for k, v in translation.items() if k == idx_2}
+            df=df,
+            translation={k: v for k, v in translation.items() if k == idx_2},
+            columns=['name', 'description'],
         )
 
         # Verify
@@ -208,7 +266,9 @@ class TestTranslateDataFrame:
 
         # Exercise
         # ===========================================================
-        df_result = translate_dataframe(df=df, translation=translation)
+        df_result = translate_dataframe(
+            df=df, translation=translation, columns=('name', 'description')
+        )
 
         # Verify
         # ===========================================================
@@ -242,6 +302,107 @@ class TestTranslateDataFrame:
         print(f'df_exp:\n{df_exp}')
 
         assert_frame_equal(df_result, df_exp)
+
+        # Clean up - None
+        # ===========================================================
+
+    def test_copy_df(
+        self, df_translation: tuple[pd.DataFrame, TranslationMapping, pd.DataFrame]
+    ) -> None:
+        r"""Test to return a copy of the translated DataFrame rather than modifying inplace."""
+
+        # Setup
+        # ===========================================================
+        df, translation, df_trans = df_translation
+
+        # Exercise
+        # ===========================================================
+        df_result = translate_dataframe(df=df, translation=translation, copy=True)
+
+        # Verify
+        # ===========================================================
+        print(f'df_result:\n{df_result}\n')
+        print(f'df_exp:\n{df_trans}')
+
+        assert_frame_equal(df_result, df_trans)
+
+        with pytest.raises(AssertionError):  # df should not have been modified.
+            assert_frame_equal(df_result, df)
+
+        # Clean up - None
+        # ===========================================================
+
+    @pytest.mark.parametrize(
+        ('columns', 'id_columns'),
+        [
+            pytest.param(
+                (('name', 'description'), 'tool'),
+                (None, 'tool_id'),
+                id='all columns, default index col',
+            ),
+            pytest.param((None, ('tool',)), ('rs_id', 'tool_id'), id='None to specify all columns'),
+        ],
+    )
+    def test_multi_translate(
+        self,
+        columns: Sequence[list[str] | str | None],
+        id_columns: Sequence[str | None],
+        df_multi_translation: tuple[
+            pd.DataFrame, tuple[TranslationMapping, TranslationMapping], pd.DataFrame
+        ],
+    ) -> None:
+        r"""Test to apply multiple translations to the selected columns of the same DataFrame."""
+
+        # Setup
+        # ===========================================================
+        df, translations, df_trans = df_multi_translation
+
+        # Exercise
+        # ===========================================================
+        df_result = translate_dataframe(
+            df=df, translation=translations, columns=columns, id_column=id_columns
+        )
+
+        # Verify
+        # ===========================================================
+        print(f'df_result:\n{df_result}\n')
+        print(f'df_exp:\n{df_trans}')
+
+        assert_frame_equal(df_result, df_trans)
+
+        # Clean up - None
+        # ===========================================================
+
+    @pytest.mark.raises
+    def test_multi_translate_unequal_sequence_lengths(
+        self,
+        df_multi_translation: tuple[
+            pd.DataFrame, tuple[TranslationMapping, TranslationMapping], pd.DataFrame
+        ],
+    ) -> None:
+        r"""The length of the sequences translations, columns and id_column do not match."""
+
+        # Setup
+        # ===========================================================
+        df, translations, _ = df_multi_translation
+        error_msg_exp = 'Mismatch in lengths of translations, columns and id_column (2 != 3 != 1) !'
+
+        # Exercise
+        # ===========================================================
+        with pytest.raises(exceptions.CambiatoError) as exc_info:
+            translate_dataframe(
+                df=df,
+                translation=translations,
+                columns=(['name', 'description'], 'tool', 'extra'),
+                id_column=[None],
+            )
+
+        # Verify
+        # ===========================================================
+        error_msg = exc_info.value.args[0]
+        print(error_msg)
+
+        assert error_msg == error_msg_exp
 
         # Clean up - None
         # ===========================================================
