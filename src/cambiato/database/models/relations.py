@@ -5,7 +5,7 @@ from datetime import date, datetime
 from typing import ClassVar
 
 # Third party
-from sqlalchemy import TIMESTAMP, BigInteger, ForeignKey, Index, false, func
+from sqlalchemy import TIMESTAMP, BigInteger, ForeignKey, Index, false, func, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from streamlit_passwordless.database.models import Base, ModifiedAndCreatedColumnMixin
 
@@ -1706,6 +1706,21 @@ class OrderStatus(ModifiedAndCreatedColumnMixin, Base):
     description : str or None
         A description of the status
 
+    is_todo : bool, default True
+        True if the state of the order is "To do" and a technician has not.
+        started working on the order yet.
+
+    is_in_progress : bool, default False
+        True if the state of the order is "In progress" and a technician has
+        started working on the order.
+
+    is_on_hold : bool, default False
+        True if the state of the order is "On hold" and should not be worked on any further.
+
+    is_completed : bool, default False
+        True if the state of the order is "Completed" and the order is considered
+        finished from a technician's point of view. Is indexed.
+
     updated_at : datetime or None
         The timestamp at which the order status was last updated (UTC).
 
@@ -1725,6 +1740,10 @@ class OrderStatus(ModifiedAndCreatedColumnMixin, Base):
         'utility_id',
         'name',
         'description',
+        'is_todo',
+        'is_in_progress',
+        'is_on_hold',
+        'is_completed',
         'updated_at',
         'updated_by',
         'created_at',
@@ -1737,6 +1756,10 @@ class OrderStatus(ModifiedAndCreatedColumnMixin, Base):
     utility_id: Mapped[int | None] = mapped_column(ForeignKey(Utility.utility_id))
     name: Mapped[str]
     description: Mapped[str | None]
+    is_todo: Mapped[bool] = mapped_column(server_default=text('1'))
+    is_in_progress: Mapped[bool] = mapped_column(server_default=text('0'))
+    is_on_hold: Mapped[bool] = mapped_column(server_default=text('0'))
+    is_completed: Mapped[bool] = mapped_column(server_default=text('0'))
 
     utility: Mapped[Utility] = relationship()
     orders: Mapped[list['Order']] = relationship(back_populates='order_status')
@@ -1748,6 +1771,8 @@ Index(
     OrderStatus.name,
     unique=True,
 )
+
+Index(f'{OrderStatus.__tablename__}_is_completed_ix', OrderStatus.is_completed)
 
 
 class Order(ModifiedAndCreatedColumnMixin, Base):

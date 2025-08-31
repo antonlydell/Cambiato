@@ -276,20 +276,32 @@ assigned_order_status = OrderStatus(
     description='An order that is assigned to a technician, but it is yet not started.',
 )
 in_progress_order_status = OrderStatus(
-    order_status_id=3, name='In Progress', description='An order that is in progress.'
+    order_status_id=3,
+    name='In Progress',
+    description='An order that is in progress.',
+    is_todo=False,
+    is_in_progress=True,
 )
 on_hold_order_status = OrderStatus(
     order_status_id=4,
     name='On Hold',
     description='An order that is on hold and should not be worked on.',
+    is_todo=False,
+    is_on_hold=True,
 )
 completed_by_technician_order_status = OrderStatus(
     order_status_id=5,
     name='Completed by Technician',
     description='An order that has been completed by a technician.',
+    is_todo=False,
+    is_completed=True,
 )
 completed_order_status = OrderStatus(
-    order_status_id=6, name='Completed', description='An order that has been fully completed.'
+    order_status_id=6,
+    name='Completed',
+    description='An order that has been fully completed.',
+    is_todo=False,
+    is_completed=True,
 )
 
 # Role
