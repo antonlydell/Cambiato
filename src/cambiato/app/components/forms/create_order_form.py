@@ -117,6 +117,7 @@ def _create_scheduled_timestamps(
 
 def create_order_form(
     session: Session,
+    utility_id: int,
     order_types: OrderTypeDataFrameModel,
     order_statuses: OrderStatusDataFrameModel,
     facilities: FacilityDataFrameModel,
@@ -135,6 +136,9 @@ def create_order_form(
     ----------
     session : cambiato.db.Session
         An active database session.
+
+    utility_id : int
+        The primary key of the utility that the created order should belong to.
 
     order_types : cambiato.models.OrderTypeDataFrameModel
         The selectable order types of the order to create.
@@ -293,6 +297,7 @@ def create_order_form(
             order_type_id=order_type_id,
             order_status_id=order_status_id,
             ext_id=ext_id.strip() if ext_id else ext_id,
+            utility_id=utility_id,
             facility_id=facility_id,
             customer_id=customer_id,
             checklist_id=checklist_id,

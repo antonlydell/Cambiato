@@ -26,6 +26,7 @@ ButtonType: TypeAlias = Literal['primary', 'secondary', 'tertiary']
 def create_order_button(
     label: str,
     session: Session,
+    utility_id: int | None,
     order_types: OrderTypeDataFrameModel,
     order_statuses: OrderStatusDataFrameModel,
     facilities: FacilityDataFrameModel,
@@ -49,6 +50,10 @@ def create_order_button(
 
     session : cambiato.db.Session
         An active database session.
+
+    utility_id : int or None
+        The primary key of the utility that the created order should belong to.
+        If None the button will be disabled.
 
     order_types : cambiato.models.OrderTypeDataFrameModel
         The selectable order types of the order to create.
@@ -99,13 +104,14 @@ def create_order_button(
 
     return st.button(
         label=label,
-        disabled=disabled,
+        disabled=disabled or utility_id is None,
         icon=icon,
         type=button_type,
         help=help_text,
         on_click=create_order_on_click,  # type: ignore[arg-type]
         kwargs={
             'session': session,
+            'utility_id': utility_id,
             'order_types': order_types,
             'order_statuses': order_statuses,
             'facilities': facilities,
