@@ -102,3 +102,19 @@ class ConfigFileNotFoundError(ConfigError):
 
 class ParseConfigError(ConfigError):
     """If the config file cannot be parsed correctly."""
+
+
+class DataFrameError(CambiatoError):
+    """Errors related to working with DataFrames."""
+
+
+class MissingColumnError(DataFrameError):
+    """If a column is not part of a DataFrame."""
+
+
+class MissingRowError(DataFrameError):
+    """If a row is not found when searching the DataFrame."""
+
+
+class MultipleRowsForColumnValueError(DataFrameError):
+    """If a value of a column maps to multiple rows."""

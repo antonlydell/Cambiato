@@ -39,6 +39,10 @@ from cambiato.exceptions import (
     CambiatoError,
     ConfigError,
     ConfigFileNotFoundError,
+    DataFrameError,
+    MissingColumnError,
+    MissingRowError,
+    MultipleRowsForColumnValueError,
     ParseConfigError,
 )
 from cambiato.log import setup_logging
@@ -91,6 +95,10 @@ __all__ = [
     'CambiatoError',
     'ConfigError',
     'ConfigFileNotFoundError',
+    'DataFrameError',
+    'MissingColumnError',
+    'MissingRowError',
+    'MultipleRowsForColumnValueError',
     'ParseConfigError',
     # log
     'setup_logging',
