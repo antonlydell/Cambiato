@@ -1,8 +1,9 @@
 r"""The core data models of Cambiato."""
 
 # Standard library
-from typing import Any, ClassVar, TypeAlias
+from abc import abstractmethod
 from collections.abc import Callable, Mapping, Sequence
+from typing import Any, ClassVar, Generic, TypeAlias, TypeVar
 
 # Third party
 import pandas as pd
@@ -28,7 +29,10 @@ class BaseModel(PydanticBaseModel):
             raise exceptions.CambiatoError(str(e)) from None
 
 
-class BaseDataFrameModel(BaseModel):
+IndexT = TypeVar('IndexT', int, str)
+
+
+class BaseDataFrameModel(BaseModel, Generic[IndexT]):
     """The base model that all DataFrame models will inherit from.
 
     A DataFrame model represents a database table, a query or some other table like structure.
@@ -90,6 +94,11 @@ class BaseDataFrameModel(BaseModel):
 
         return self.df.dtypes
 
+    @property
+    @abstractmethod
+    def index_type(self) -> Callable[[Any], IndexT]:
+        """The constructor for the index type, which should be int or str."""
+
     def display_row(self, id_: int | str) -> str:
         r"""String representation of a row in the DataFrame.
 
@@ -116,6 +125,122 @@ class BaseDataFrameModel(BaseModel):
         """
 
         return lambda x: self.display_row(x)
+
+    def get_index(self, value: Any, column: str) -> IndexT | None:
+        r"""Get the index of a row from a value of a column.
+
+        Should only be used for columns with values that uniquely identifies a row.
+
+        Parameters
+        ----------
+        value : Any
+            The value of the `column` for which to get the row index ID.
+
+        column : str
+            The column to filter by `value`.
+
+        Returns
+        -------
+        int or str or None
+            The index ID of row matching `value` in `column`. If no match None is returned.
+
+        Raises
+        ------
+        cambiato.MissingColumnError
+            If `column` is not among the columns of the DataFrame.
+
+        cambiato.MultipleRowsForColumnValueError
+            If multiple rows match the supplied column value.
+        """
+
+        df = self.df
+
+        if column not in df.columns:
+            raise exceptions.MissingColumnError(
+                f'Column "{column}" is not among the columns '
+                f'of the DataFrame : {df.columns.tolist()}'
+            )
+
+        mask = df[column].eq(value)
+
+        if not mask.any():
+            return None
+
+        pos = int(mask.to_numpy().argmax())
+
+        if mask.iloc[pos + 1 :].any():
+            raise exceptions.MultipleRowsForColumnValueError(
+                f'Multiple rows match column "{column}" == {value!r}!'
+            )
+
+        return self.index_type(df.index[pos])
+
+    def get_index_by_row_nr(self, row_nr: int) -> IndexT:
+        r"""Get the index of a row from its row number in the DataFrame.
+
+        Parameters
+        ----------
+        row_nr : int
+            The row number of the DataFrame (zero indexed).
+
+        Returns
+        -------
+        int or str
+            The index ID of the row matching `row_nr`.
+
+        Raises
+        ------
+        cambiato.MissingRowError
+            If `row_nr` does not exist in the DataFrame.
+        """
+
+        try:
+            return self.index_type(self.df.index[row_nr])
+        except IndexError:
+            raise exceptions.MissingRowError(
+                f'Row number {row_nr} does not exist in DataFrame with nr_rows = {self.row_count}!'
+            ) from None
+
+    def get_column(
+        self, column: str, unique: bool = False, sort_ascending: bool | None = None
+    ) -> pd.Series:
+        r"""Get the values of a column in the DataFrame.
+
+        Parameters
+        ----------
+        column : str
+            The name of the column to extract.
+
+        unique : bool, default False
+            True if only the unique values from the column should be extracted and
+            False for the entire column as is.
+
+        sort_ascending : bool or None, default None
+            True if the column values should be sorted in ascending order and False
+            for descending order. If None no sorting is performed.
+
+        Returns
+        -------
+        pandas.Series
+            The extracted column.
+
+        Raises
+        ------
+        cambiato.MissingColumnError
+            If `column` is not among the columns of the DataFrame.
+        """
+
+        df = self.df
+
+        if column not in df.columns:
+            raise exceptions.MissingColumnError(
+                f'Column "{column}" is not among the columns '
+                f'of the DataFrame : {df.columns.tolist()}'
+            )
+
+        s = df[column].drop_duplicates() if unique else df[column]
+
+        return s if sort_ascending is None else s.sort_values(ascending=sort_ascending)
 
     def localize_and_convert_timezone(
         self,
@@ -178,3 +303,19 @@ class BaseDataFrameModel(BaseModel):
             df[col] = s
 
         return df
+
+
+class IntIndexedDataFrameModel(BaseDataFrameModel[int]):
+    """A DataFrame model with an integer based index column."""
+
+    @property
+    def index_type(self) -> Callable[[Any], int]:
+        return int
+
+
+class StrIndexedDataFrameModel(BaseDataFrameModel[str]):
+    """A DataFrame model with a string based index column."""
+
+    @property
+    def index_type(self) -> Callable[[Any], str]:
+        return str

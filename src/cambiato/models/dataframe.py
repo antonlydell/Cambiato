@@ -4,10 +4,16 @@ r"""The DataFrame models, which represent table like structures of objects."""
 from typing import ClassVar
 
 # Local
-from cambiato.models.core import BaseDataFrameModel, ColumnList, StrMapping
+from cambiato import exceptions
+from cambiato.models.core import (
+    ColumnList,
+    IntIndexedDataFrameModel,
+    StrIndexedDataFrameModel,
+    StrMapping,
+)
 
 
-class ChecklistDataFrameModel(BaseDataFrameModel):
+class ChecklistDataFrameModel(IntIndexedDataFrameModel):
     r"""A model of the checklists represented as a DataFrame."""
 
     c_checklist_id: ClassVar[str] = 'order_status_id'
@@ -20,7 +26,7 @@ class ChecklistDataFrameModel(BaseDataFrameModel):
         return self.df.loc[id_, self.c_name]  # type: ignore[return-value]
 
 
-class FacilityDataFrameModel(BaseDataFrameModel):
+class FacilityDataFrameModel(IntIndexedDataFrameModel):
     r"""A model of the facilities represented as a DataFrame."""
 
     c_facility_id: ClassVar[str] = 'facility_id'
@@ -40,7 +46,7 @@ class FacilityDataFrameModel(BaseDataFrameModel):
         return f'{row[self.c_ean]} | {row[self.c_address]}'
 
 
-class OrderStatusDataFrameModel(BaseDataFrameModel):
+class OrderStatusDataFrameModel(IntIndexedDataFrameModel):
     r"""A model of the order statuses represented as a DataFrame."""
 
     c_order_status_id: ClassVar[str] = 'order_status_id'
@@ -53,7 +59,7 @@ class OrderStatusDataFrameModel(BaseDataFrameModel):
         return self.df.loc[id_, self.c_name]  # type: ignore[return-value]
 
 
-class OrderTypeDataFrameModel(BaseDataFrameModel):
+class OrderTypeDataFrameModel(IntIndexedDataFrameModel):
     r"""A model of the order types represented as a DataFrame."""
 
     c_order_type_id: ClassVar[str] = 'order_type_id'
@@ -66,7 +72,7 @@ class OrderTypeDataFrameModel(BaseDataFrameModel):
         return self.df.loc[id_, self.c_name]  # type: ignore[return-value]
 
 
-class UserDataFrameModel(BaseDataFrameModel):
+class UserDataFrameModel(StrIndexedDataFrameModel):
     r"""A model of the users represented as a DataFrame."""
 
     c_user_id: ClassVar[str] = 'user_id'
@@ -79,7 +85,7 @@ class UserDataFrameModel(BaseDataFrameModel):
         return self.df.loc[id_, self.c_displayname]  # type: ignore[return-value]
 
 
-class UtilityDataFrameModel(BaseDataFrameModel):
+class UtilityDataFrameModel(IntIndexedDataFrameModel):
     r"""A model of the utilities represented as a DataFrame."""
 
     c_utility_id: ClassVar[str] = 'utility_id'
