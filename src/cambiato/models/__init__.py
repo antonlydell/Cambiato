@@ -4,6 +4,7 @@ from cambiato.models.core import BaseDataFrameModel, BaseModel
 from cambiato.models.dataframe import (
     ChecklistDataFrameModel,
     FacilityDataFrameModel,
+    OrderDataFrameModel,
     OrderStatusDataFrameModel,
     OrderTypeDataFrameModel,
     UserDataFrameModel,
@@ -18,6 +19,7 @@ __all__ = [
     # dataframe
     'ChecklistDataFrameModel',
     'FacilityDataFrameModel',
+    'OrderDataFrameModel',
     'OrderStatusDataFrameModel',
     'OrderTypeDataFrameModel',
     'UserDataFrameModel',

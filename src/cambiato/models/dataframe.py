@@ -46,6 +46,56 @@ class FacilityDataFrameModel(IntIndexedDataFrameModel):
         return f'{row[self.c_ean]} | {row[self.c_address]}'
 
 
+class OrderDataFrameModel(IntIndexedDataFrameModel):
+    r"""A model of the orders represented as a DataFrame."""
+
+    c_order_id: ClassVar[str] = 'order_id'
+    c_order_type_id: ClassVar[str] = 'order_type_id'
+    c_order_type_name: ClassVar[str] = 'order_type_name'
+    c_order_status_id: ClassVar[str] = 'order_status_id'
+    c_order_status_name: ClassVar[str] = 'order_status_name'
+    c_facility_id: ClassVar[str] = 'facility_id'
+    c_facility_ean: ClassVar[str] = 'facility_ean'
+    c_address: ClassVar[str] = 'address'
+    c_ext_id: ClassVar[str] = 'ext_id'
+    c_description: ClassVar[str] = 'description'
+    c_assigned_to_user_id: ClassVar[str] = 'assigned_to_user_id'
+    c_assigned_to_displayname: ClassVar[str] = 'assigned_to_displayname'
+    c_scheduled_start_at: ClassVar[str] = 'scheduled_start_at'
+    c_scheduled_end_at: ClassVar[str] = 'scheduled_end_at'
+    c_created_by: ClassVar[str] = 'created_by'
+    c_created_at: ClassVar[str] = 'created_at'
+    c_updated_by: ClassVar[str] = 'updated_by'
+    c_updated_at: ClassVar[str] = 'updated_at'
+
+    index_cols: ClassVar[ColumnList] = [c_order_id]
+    parse_dates: ClassVar[ColumnList] = [
+        c_scheduled_start_at,
+        c_scheduled_end_at,
+        c_created_at,
+        c_created_by,
+    ]
+
+    def display_row(self, id_: int | str) -> str:
+        try:
+            s = self.df.loc[
+                id_,  # type: ignore[index]
+                [
+                    self.c_order_type_name,  # type: ignore[list-item]
+                    self.c_facility_ean,  # type: ignore[list-item]
+                    self.c_order_status_name,  # type: ignore[list-item]
+                    self.c_address,  # type: ignore[list-item]
+                ],
+            ]
+        except KeyError:
+            raise exceptions.MissingRowError(f'Order with order_id={id_} does not exist!') from None
+
+        return (
+            f'ID:{id_}|{s[self.c_facility_ean]}|{s[self.c_address]}|'
+            f'{s[self.c_order_type_name]}|{s[self.c_order_status_name]}'
+        )
+
+
 class OrderStatusDataFrameModel(IntIndexedDataFrameModel):
     r"""A model of the order statuses represented as a DataFrame."""
 
