@@ -62,5 +62,29 @@
             }
         },
         "create_order_button" : {"label": "Create order"}
+    },
+    "components" : {
+        "dataframes": {
+            "edit_orders" : {
+                "c_order_id": "Order ID",
+                "c_assigned_to_displayname": "Assigned to Technician",
+                "c_scheduled_start_at" : "Scheduled Start At",
+                "c_scheduled_end_at" : "Scheduled End At",
+                "c_order_status_name" : "Order Status",
+                "c_order_type_name" : "Order Type",
+                "c_facility_ean" : "Facility",
+                "c_address" : "Address",
+                "c_ext_id" : "External ID",
+                "c_description" : "Description",
+                "c_created_by" : "Created By",
+                "c_created_at" : "Created At",
+                "c_updated_by" : "Updated By",
+                "c_updated_at" : "Updated At",
+                "validation_messages": {
+                    "duplicate_scheduled_start_time": "Duplicate scheduled start time \"{start_time}\" for technician \"{technician}\" for order ID : {order_ids} !",
+                    "scheduled_end_time_le_start_time": "The scheduled end time is <= start time for order ID : {order_ids} !"
+                }
+            }
+        }
     }
 }

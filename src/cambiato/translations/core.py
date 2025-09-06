@@ -12,6 +12,7 @@ import pandas as pd
 from cambiato import exceptions
 from cambiato.config import Language
 from cambiato.models.core import BaseModel
+from cambiato.translations.components import Components
 from cambiato.translations.database import Database
 from cambiato.translations.order import Order
 
@@ -38,11 +39,15 @@ class TranslationModel(BaseModel):
     database : cambiato.translations.Database
         The translations for the default data in the database.
 
+    components : cambiato.translations.Components
+        The translations for the components of the app.
+
     order : cambiato.translations.Order
         The translations for the order page.
     """
 
     database: Database
+    components: Components
     order: Order
 
 

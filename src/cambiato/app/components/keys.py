@@ -14,4 +14,6 @@ CREATE_ORDER_FORM_SCHEDULED_DAY_DATE_INPUT = 'create-order-form-scheduled-day-da
 CREATE_ORDER_FORM_SCHEDULED_START_TIME_INPUT = 'create-order-form-scheduled-start-time-input'
 CREATE_ORDER_FORM_SCHEDULED_END_TIME_INPUT = 'create-order-form-scheduled-end-time-input'
 
+EDIT_ORDERS_DATAFRAME_EDITOR = 'edit-orders-dataframe-editor'
+
 UTILITY_PILLS_SELECTOR = 'utility-pills-selector'
