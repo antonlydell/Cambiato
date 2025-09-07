@@ -9,6 +9,7 @@ from .order import (
     get_all_active_orders,
     get_all_order_statuses,
     get_all_order_types,
+    process_changed_orders,
 )
 from .user import get_all_technicians
 from .utility import get_all_utilities
@@ -26,6 +27,7 @@ __all__ = [
     'get_all_active_orders',
     'get_all_order_statuses',
     'get_all_order_types',
+    'process_changed_orders',
     # user
     'get_all_technicians',
     # utility

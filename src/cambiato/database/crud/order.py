@@ -6,12 +6,12 @@ from zoneinfo import ZoneInfo
 
 # Third party
 import pandas as pd
-from sqlalchemy import or_, select
+from sqlalchemy import delete, insert, or_, select, update
 from sqlalchemy.orm import aliased
 
 # Local
 from cambiato.core import OperationResult
-from cambiato.database.core import Session, commit
+from cambiato.database.core import ChangedDatabaseRows, Session, commit
 from cambiato.database.crud.core import build_full_address_column
 from cambiato.database.models import Facility, Order, OrderStatus, OrderType, User
 from cambiato.models.dataframe import (
@@ -274,3 +274,32 @@ def create_order(session: Session, order: Order) -> OperationResult:
 
     session.add(order)
     return commit(session=session, error_msg='Unexpected error when saving order to database!')
+
+
+def process_changed_orders(
+    session: Session, changed_orders: ChangedDatabaseRows
+) -> OperationResult:
+    r"""Process the changes (update, insert or delete) for selected orders.
+
+    Parameters
+    ----------
+    session : cambiato.db.Session
+        An active database session.
+
+    changed_orders : cambiato.db.ChangedDatabaseRows
+        The changed orders to process.
+
+    Returns
+    -------
+    cambiato.OperationResult
+        The result of processing the changed orders in the database.
+    """
+
+    if updated := changed_orders.edited_rows:
+        session.execute(update(Order), updated)
+    if added := changed_orders.added_rows:
+        session.execute(insert(Order), added)
+    if deleted := changed_orders.deleted_rows:
+        session.execute(delete(Order).where(Order.order_id.in_(deleted)))
+
+    return commit(session=session, error_msg='Error performing order updates!')

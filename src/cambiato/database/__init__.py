@@ -11,10 +11,11 @@ from cambiato.database.crud import (
     get_all_technicians,
     get_all_utilities,
     get_customer_id_by_facility_id,
+    process_changed_orders,
 )
 
 from . import models
-from .core import URL, Session, SessionFactory, commit, create_session_factory
+from .core import URL, ChangedDatabaseRows, Session, SessionFactory, commit, create_session_factory
 from .init import init
 
 # The Public API
@@ -22,6 +23,7 @@ __all__ = [
     'models',
     # core
     'URL',
+    'ChangedDatabaseRows',
     'Session',
     'SessionFactory',
     'commit',
@@ -36,6 +38,7 @@ __all__ = [
     'get_all_technicians',
     'get_all_utilities',
     'get_customer_id_by_facility_id',
+    'process_changed_orders',
     # init
     'init',
 ]
