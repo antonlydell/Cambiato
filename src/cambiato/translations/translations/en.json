@@ -86,5 +86,15 @@
                 }
             }
         }
+    },
+    "views" : {
+        "orders" : {
+            "edit_orders_view" : {
+                "save_changes_button_label": "Save Changes",
+                "schedule_entire_day_toggle_label" : "Schedule entire day",
+                "schedule_entire_day_toggle_help" : "Schedule an order for the entire day.",
+                "update_orders_success_message": "Successfully updated orders!"
+            }
+        }
     }
 }

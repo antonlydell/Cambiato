@@ -5,6 +5,7 @@ from .cache import (
     get_all_facilities_cached,
     get_all_order_statuses_cached,
     get_all_order_types_cached,
+    get_all_orders_cached,
     get_all_technicians_cached,
     get_all_utilities_cached,
 )
@@ -16,6 +17,7 @@ __all__ = [
     'get_all_facilities_cached',
     'get_all_order_statuses_cached',
     'get_all_order_types_cached',
+    'get_all_orders_cached',
     'get_all_technicians_cached',
     'get_all_utilities_cached',
 ]

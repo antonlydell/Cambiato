@@ -15,6 +15,7 @@ from cambiato.models.core import BaseModel
 from cambiato.translations.components import Components
 from cambiato.translations.database import Database
 from cambiato.translations.order import Order
+from cambiato.translations.views import Views
 
 _Translated: TypeAlias = Mapping[str, str]
 TranslationMapping: TypeAlias = Mapping[int, _Translated] | Mapping[str, _Translated]
@@ -44,11 +45,15 @@ class TranslationModel(BaseModel):
 
     order : cambiato.translations.Order
         The translations for the order page.
+
+    views : cambiato.translations.Views
+        The translations for the views of the app.
     """
 
     database: Database
     components: Components
     order: Order
+    views: Views
 
 
 def load_translation(language: Language) -> TranslationModel:

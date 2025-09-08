@@ -16,6 +16,7 @@ from cambiato.translations.core import (
 )
 from cambiato.translations.database import Database
 from cambiato.translations.order import CreateOrderForm, CreateOrderFormValidationMessage, Order
+from cambiato.translations.views import EditOrdersView, Orders, Views
 
 # The Public API
 __all__ = [
@@ -36,4 +37,8 @@ __all__ = [
     'CreateOrderForm',
     'CreateOrderFormValidationMessage',
     'Order',
+    # views
+    'EditOrdersView',
+    'Orders',
+    'Views',
 ]
