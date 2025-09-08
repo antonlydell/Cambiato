@@ -9,6 +9,7 @@ from typing import Any, ClassVar, Generic, TypeAlias, TypeVar
 import pandas as pd
 from pydantic import BaseModel as PydanticBaseModel
 from pydantic import ConfigDict, Field, ValidationError
+from streamlit_passwordless import User as User
 
 # Local
 from cambiato import exceptions
