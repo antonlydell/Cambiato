@@ -100,5 +100,11 @@
                 "update_orders_success_message": "Successfully updated orders!"
             }
         }
+    },
+    "controllers" : {
+        "order" : {
+            "page_title": "Order",
+            "select_utility_info_message": "Please select a utility above!"
+        }
     }
 }

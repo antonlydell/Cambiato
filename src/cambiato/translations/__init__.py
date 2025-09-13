@@ -12,6 +12,7 @@ from cambiato.translations.components import (
     EditOrdersDataFrameValidationMessages,
     Forms,
 )
+from cambiato.translations.controllers import Controllers, OrderController
 from cambiato.translations.core import (
     TranslationMapping,
     TranslationModel,
@@ -20,11 +21,16 @@ from cambiato.translations.core import (
     translate_dataframe,
 )
 from cambiato.translations.database import Database
-from cambiato.translations.order import Order
 from cambiato.translations.views import EditOrdersView, Orders, Views
 
 # The Public API
 __all__ = [
+    # core
+    'TranslationMapping',
+    'TranslationModel',
+    'create_translation_mapping',
+    'load_translation',
+    'translate_dataframe',
     # components
     'Buttons',
     'Components',
@@ -35,16 +41,11 @@ __all__ = [
     'EditOrdersDataFrame',
     'EditOrdersDataFrameValidationMessages',
     'Forms',
-    # core
-    'TranslationMapping',
-    'TranslationModel',
-    'create_translation_mapping',
-    'load_translation',
-    'translate_dataframe',
+    # controllers
+    'Controllers',
+    'OrderController',
     # database
     'Database',
-    # order
-    'Order',
     # views
     'EditOrdersView',
     'Orders',
