@@ -28,42 +28,13 @@
             "5": {"name": "Gas", "description": "The gas utility."}
         }
     },
-    "order": {
-        "page_title": "Order",
-        "create_order_form" : {
-            "title": "Create Order",
-            "department_id": "Department",
-            "order_type_id_label": "Order Type",
-            "order_type_id_placeholder": "Order Type",
-            "order_status_id_label": "Order Status",
-            "order_status_id_placeholder": "Order Status",
-            "ext_id_label": "External ID",
-            "ext_id_placeholder": "External ID",
-            "facility_id_label": "Facility ID",
-            "facility_id_placeholder": "Facility ID",
-            "location_id_label": "Location ID",
-            "location_id_placeholder": "Location ID",
-            "checklist_id_label": "Checklist",
-            "checklist_id_placeholder": "Checklist",
-            "technician_id_label": "Technician",
-            "technician_id_placeholder": "Assign to Technician",
-            "description_label": "Description",
-            "description_placeholder": "Further details about the order to the technician.",
-            "scheduled_date": "Scheduled Day",
-            "scheduled_start_at": "Scheduled Start Time",
-            "scheduled_end_at": "Scheduled End Time",
-            "submit_button_label": "Create",
-            "success_message": "Successfully created order with order_id: {order_id}",
-            "error_message": "Unexpected error when saving order to database!",
-            "validation_messages": {
-                "start_time_no_end_time": "Start time must be specified if end time is!",
-                "end_time_no_start_time": "End time must be specified if start time is!",
-                "start_time_geq_end_time": "start time ({start_time}) must be < end time ({end_time})!"
-            }
-        },
-        "create_order_button" : {"label": "Create order"}
+    "order" : {
+        "page_title": "Order"
     },
     "components" : {
+        "buttons": {
+            "create_order_button" : {"label": "Create order"}
+        },
         "dataframes": {
             "edit_orders" : {
                 "c_order_id": "Order ID",
@@ -83,6 +54,39 @@
                 "validation_messages": {
                     "duplicate_scheduled_start_time": "Duplicate scheduled start time \"{start_time}\" for technician \"{technician}\" for order ID : {order_ids} !",
                     "scheduled_end_time_le_start_time": "The scheduled end time is <= start time for order ID : {order_ids} !"
+                }
+            }
+        },
+        "forms": {
+            "create_order_form" : {
+                "title": "Create Order",
+                "department_id": "Department",
+                "order_type_id_label": "Order Type",
+                "order_type_id_placeholder": "Order Type",
+                "order_status_id_label": "Order Status",
+                "order_status_id_placeholder": "Order Status",
+                "ext_id_label": "External ID",
+                "ext_id_placeholder": "External ID",
+                "facility_id_label": "Facility ID",
+                "facility_id_placeholder": "Facility ID",
+                "location_id_label": "Location ID",
+                "location_id_placeholder": "Location ID",
+                "checklist_id_label": "Checklist",
+                "checklist_id_placeholder": "Checklist",
+                "technician_id_label": "Technician",
+                "technician_id_placeholder": "Assign to Technician",
+                "description_label": "Description",
+                "description_placeholder": "Further details about the order to the technician.",
+                "scheduled_date": "Scheduled Day",
+                "scheduled_start_at": "Scheduled Start Time",
+                "scheduled_end_at": "Scheduled End Time",
+                "submit_button_label": "Create",
+                "success_message": "Successfully created order with order_id: {order_id}",
+                "error_message": "Unexpected error when saving order to database!",
+                "validation_messages": {
+                    "start_time_no_end_time": "Start time must be specified if end time is!",
+                    "end_time_no_start_time": "End time must be specified if start time is!",
+                    "start_time_geq_end_time": "start time ({start_time}) must be < end time ({end_time})!"
                 }
             }
         }
