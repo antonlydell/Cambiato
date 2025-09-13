@@ -18,7 +18,7 @@ from cambiato.app.config import (
     APP_ISSUES_PAGE_URL,
     MAINTAINER_INFO,
 )
-from cambiato.app.controller.order import controller
+from cambiato.app.controllers.order import controller
 from cambiato.app.setup import cm, session_factory, translations
 from cambiato.core import get_current_user
 

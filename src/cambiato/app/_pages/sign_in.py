@@ -13,7 +13,7 @@ from cambiato.app.config import (
     APP_ISSUES_PAGE_URL,
     MAINTAINER_INFO,
 )
-from cambiato.app.controller.sign_in import controller
+from cambiato.app.controllers.sign_in import controller
 from cambiato.app.setup import bwp_client, session_factory
 
 SIGN_IN_PATH = Path(__file__)

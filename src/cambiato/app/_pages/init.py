@@ -15,7 +15,7 @@ from cambiato.app.config import (
     APP_ISSUES_PAGE_URL,
     MAINTAINER_INFO,
 )
-from cambiato.app.controller.init import controller
+from cambiato.app.controllers.init import controller
 from cambiato.config import load_config
 from cambiato.database import create_session_factory
 
