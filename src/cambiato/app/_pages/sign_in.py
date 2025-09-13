@@ -7,7 +7,7 @@ from pathlib import Path
 import streamlit as st
 
 # Local
-from cambiato.app import auth
+from cambiato.app.auth import is_authenticated
 from cambiato.app.config import (
     APP_HOME_PAGE_URL,
     APP_ISSUES_PAGE_URL,
@@ -27,7 +27,7 @@ ABOUT = f"""Sign in to Cambiato or register an account.
 def sign_in_page() -> None:
     r"""Run the sign in page of Cambiato."""
 
-    authenticated = auth.authenticated()
+    _is_authenticated = is_authenticated()
     st.set_page_config(
         page_title='Cambiato - Sign in',
         page_icon=':sparkles:',
@@ -37,11 +37,11 @@ def sign_in_page() -> None:
             'Report a bug': APP_ISSUES_PAGE_URL,
             'About': ABOUT,
         },
-        initial_sidebar_state='auto' if authenticated else 'collapsed',
+        initial_sidebar_state='auto' if _is_authenticated else 'collapsed',
     )
 
     with session_factory() as session:
-        controller(session=session, client=bwp_client, authenticated=authenticated)
+        controller(session=session, client=bwp_client, is_authenticated=_is_authenticated)
 
 
 if __name__ in {'__main__', '__page__'}:

@@ -10,7 +10,7 @@ from cambiato.database import Session
 
 
 def controller(
-    session: Session, client: stp.BitwardenPasswordlessClient, authenticated: bool = False
+    session: Session, client: stp.BitwardenPasswordlessClient, is_authenticated: bool = False
 ) -> None:
     r"""Render the sign in and register page.
 
@@ -22,14 +22,14 @@ def controller(
     client : streamlit_passwordless.BitwardenPasswordlessClient
         The client for interacting with the backend API of Bitwarden Passwordless.dev.
 
-    authenticated : bool
+    is_authenticated : bool, default False
         True if the user is authenticated and False otherwise.
     """
 
     st.title('Cambiato')
 
     with st.container(border=True):
-        if authenticated:
+        if is_authenticated:
             stp.bitwarden_register_form_existing_user(
                 client=client, db_session=session, border=False
             )
