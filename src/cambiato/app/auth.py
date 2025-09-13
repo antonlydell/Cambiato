@@ -108,3 +108,18 @@ def is_authenticated(user: User | None = None) -> bool:
     st.session_state[IS_AUTHENTICATED] = is_authenticated
 
     return is_authenticated
+
+
+def sign_out(user: User | None = None) -> None:
+    r"""Sign out a user from the application.
+
+    Parameters
+    ----------
+    user : cambiato.models.User or None, default None
+        The user to sign out. If None the user is loaded from the session state.
+    """
+
+    st.session_state[IS_AUTHENTICATED] = False
+    st.session_state[USER_AUTHORIZED_PERMISSIONS] = set()
+    st.session_state[USER_UNAUTHORIZED_PERMISSIONS] = set()
+    stp.sign_out(user=user)

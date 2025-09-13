@@ -8,9 +8,11 @@ from zoneinfo import ZoneInfo
 import streamlit as st
 
 # Local
+from cambiato.app.auth import get_current_user, sign_out
 from cambiato.app.components import keys
 from cambiato.app.components.forms.create_order_form import create_order_form
 from cambiato.database import Session
+from cambiato.models import User
 from cambiato.models.dataframe import (
     ChecklistDataFrameModel,
     FacilityDataFrameModel,
@@ -21,6 +23,61 @@ from cambiato.models.dataframe import (
 from cambiato.translations import CreateOrderForm
 
 ButtonType: TypeAlias = Literal['primary', 'secondary', 'tertiary']
+
+
+def sign_out_button(
+    user: User | None = None,
+    label: str = 'Sign out',
+    icon: str | None = None,
+    button_type: ButtonType = 'primary',
+    help_text: str | None = None,
+    use_container_width: bool = False,
+) -> bool:
+    r"""The sign out button to sign out a user from the application.
+
+    If clicked the user is signed out from the application.
+    The button is disabled if a user is not signed in.
+
+    Parameters
+    ----------
+    user : cambiato.models.User or None, default None
+        The user to sign out. If None the user is loaded from the session state.
+
+    label : str, default 'Sign out'
+        The label of the sign out button. GitHub-flavored Markdown is supported.
+
+    icon : str or None, default None
+        An optional icon to display next to the `label` of the button.
+        See the `icon` parameter of :func:`streamlit.button` for more info.
+
+    button_type : Literal['primary', 'secondary', 'tertiary'], default 'primary'
+        The styling of the button. Emulates the `type` parameter of :func:`streamlit.button`.
+
+    help_text : str or None, default None
+        An optional help text to display when hovering over the button.
+
+    use_container_width : bool, default False
+        If True the button will take upp the full width of the parent container
+        and if False it will be sized to fit the content of `label` and `icon`.
+
+    Returns
+    -------
+    clicked : bool
+        True if the button was clicked and False otherwise.
+    """
+
+    user = get_current_user() if user is None else user
+
+    return st.button(
+        label=label,
+        icon=icon,
+        type=button_type,
+        help=help_text,
+        use_container_width=use_container_width,
+        disabled=user is None or not user.is_authenticated,
+        on_click=sign_out,
+        kwargs={'user': user},
+    )
 
 
 def create_order_button(

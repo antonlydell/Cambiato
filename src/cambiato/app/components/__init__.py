@@ -1,7 +1,7 @@
 r"""The components that make up the web app."""
 
 # Local
-from cambiato.app.components.buttons import ButtonType, create_order_button
+from cambiato.app.components.buttons import ButtonType, create_order_button, sign_out_button
 from cambiato.app.components.core import (
     BannerContainer,
     BannerContainerMapping,
@@ -35,6 +35,7 @@ __all__ = [
     # buttons
     'ButtonType',
     'create_order_button',
+    'sign_out_button',
     # core
     'BannerContainer',
     'BannerContainerMapping',
