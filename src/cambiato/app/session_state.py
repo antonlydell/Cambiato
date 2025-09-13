@@ -5,7 +5,7 @@ r"""Keys of the session state of the web app."""
 # =================================================================================================
 
 # True if the user is authenticated and False otherwise.
-AUTHENTICATED = 'authenticated'
+IS_AUTHENTICATED = 'is-authenticated'
 
 # A set of permissions that are authorized for the user.
 USER_AUTHORIZED_PERMISSIONS = 'user-authorized-permissions'

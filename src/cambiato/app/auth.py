@@ -11,11 +11,12 @@ from streamlit_passwordless import SuperUserRole as SuperUserRole
 from streamlit_passwordless import UserRole as UserRole
 from streamlit_passwordless import ViewerRole as ViewerRole
 from streamlit_passwordless import authorized as authorized
+from streamlit_passwordless import get_current_user as get_current_user
 
 # Local
 from cambiato import exceptions
 from cambiato.app.session_state import (
-    AUTHENTICATED,
+    IS_AUTHENTICATED,
     USER_AUTHORIZED_PERMISSIONS,
     USER_UNAUTHORIZED_PERMISSIONS,
 )
@@ -83,20 +84,27 @@ def has_permission(user: User, permission: Permission) -> bool:
     return has_permission
 
 
-def authenticated(user: User | None = None) -> bool:
+def is_authenticated(user: User | None = None) -> bool:
     r"""Check if the current user is authenticated.
 
     Parameters
     ----------
-    user : streamlit_passwordless.User or None, default None
+    user : cambiato.models.User or None, default None
         The user for which to check the authentication status.
-        The default option is to fetch the current user from the
-        session state.
+        The default is to fetch the current user from the session state.
+
+    Returns
+    -------
+    is_authenticated : bool
+        True if the user is authenticated and False otherwise.
     """
 
-    if st.session_state.get(AUTHENTICATED, False) is True:
+    if st.session_state.get(IS_AUTHENTICATED, False) is True:
         return True
 
-    user = stp.get_current_user() if user is None else user
+    user = get_current_user() if user is None else user
 
-    return user is not None and user.is_authenticated
+    is_authenticated = user is not None and user.is_authenticated
+    st.session_state[IS_AUTHENTICATED] = is_authenticated
+
+    return is_authenticated
