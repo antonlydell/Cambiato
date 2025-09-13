@@ -7,8 +7,12 @@ from pathlib import Path
 import streamlit as st
 
 # Local
-from cambiato.app import auth
 from cambiato.app._pages import Pages
+from cambiato.app.auth import (
+    Permission,
+    authorized,
+    has_permission,
+)
 from cambiato.app.config import (
     APP_HOME_PAGE_URL,
     APP_ISSUES_PAGE_URL,
@@ -26,7 +30,7 @@ ABOUT = f"""Create and manage orders.
 """
 
 
-@auth.authorized(redirect=Pages.SIGN_IN)
+@authorized(redirect=Pages.SIGN_IN)
 def order_page() -> None:
     r"""Render the order page."""
 
@@ -42,16 +46,22 @@ def order_page() -> None:
         initial_sidebar_state='auto',
     )
 
-    translation = translations[cm.default_language]
     user = get_current_user()
+    if user is None:
+        return
+
+    translation = translations[cm.default_language]
 
     with session_factory() as session:
         controller(
             session=session,
             order_translation=translation.order,
             db_translation=translation.database,
+            edit_orders_df_trans=translation.components.dataframes.edit_orders,
+            edit_orders_view_trans=translation.views.orders.edit_orders_view,
             tz=cm.timezone,
-            user_id=user.user_id if user else None,
+            user_id=user.user_id,
+            has_edit_permission=has_permission(user=user, permission=Permission.ORDERS_EDIT),
         )
 
 
