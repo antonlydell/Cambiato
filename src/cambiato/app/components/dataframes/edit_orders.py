@@ -64,7 +64,7 @@ def _validate_duplicate_start_time(
     c_technician = model.c_assigned_to_displayname
     cols = [c_start_at, c_technician]
 
-    mask = df[~df[c_start_at].isna()].duplicated(subset=cols, keep=False)
+    mask = df[~df[c_start_at].isna() & ~df[c_technician].isna()].duplicated(subset=cols, keep=False)
     duplicated_order_ids = mask[mask.eq(True)].index
     df_duplicates = df.loc[duplicated_order_ids, cols]
 
