@@ -55,10 +55,7 @@ def order_page() -> None:
     with session_factory() as session:
         controller(
             session=session,
-            order_translation=translation.order,
-            db_translation=translation.database,
-            edit_orders_df_trans=translation.components.dataframes.edit_orders,
-            edit_orders_view_trans=translation.views.orders.edit_orders_view,
+            trans=translation.order_page,
             tz=cm.timezone,
             user_id=user.user_id,
             has_edit_permission=has_permission(user=user, permission=Permission.ORDERS_EDIT),

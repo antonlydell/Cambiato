@@ -15,6 +15,7 @@ from cambiato.models.core import BaseModel
 from cambiato.translations.components import Components
 from cambiato.translations.controllers import Controllers
 from cambiato.translations.database import Database
+from cambiato.translations.pages import OrderPage, PageTranslationModels
 from cambiato.translations.views import Views
 
 _Translated: TypeAlias = Mapping[str, str]
@@ -56,7 +57,7 @@ class TranslationModel(BaseModel):
     controllers: Controllers
 
 
-def load_translation(language: Language) -> TranslationModel:
+def load_translation(language: Language) -> PageTranslationModels:
     r"""Load the translations for the selected language.
 
     Parameters
@@ -66,13 +67,24 @@ def load_translation(language: Language) -> TranslationModel:
 
     Returns
     -------
-    cambiato.app.translations.TranslationModel
-        The model of the translations for the application.
+    cambiato.app.translations.PageTranslationModels
+        The model of the translations for the pages of the app.
     """
 
     lang_file = files('cambiato.translations.translations').joinpath(f'{language}.json')
+    tm = TranslationModel.model_validate_json(lang_file.read_text())
+    comp = tm.components
 
-    return TranslationModel.model_validate_json(lang_file.read_text())
+    order_page = OrderPage(
+        controller=tm.controllers.order,
+        db=tm.database,
+        create_order_button=comp.buttons.create_order_button,
+        create_order_form=comp.forms.create_order_form,
+        edit_orders_view=tm.views.orders.edit_orders_view,
+        edit_orders_df=comp.dataframes.edit_orders,
+    )
+
+    return PageTranslationModels(order_page=order_page)
 
 
 def create_translation_mapping(translation: Mapping[int, T]) -> TranslationMapping:

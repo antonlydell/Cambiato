@@ -21,20 +21,14 @@ from cambiato.app.views import edit_orders_view
 from cambiato.database import Session
 from cambiato.models.dataframe import ChecklistDataFrameModel, FacilityDataFrameModel
 from cambiato.translations import (
-    Database,
-    EditOrdersDataFrame,
-    EditOrdersView,
-    Order,
+    OrderPage,
     create_translation_mapping,
 )
 
 
 def controller(
     session: Session,
-    order_translation: Order,
-    db_translation: Database,
-    edit_orders_df_trans: EditOrdersDataFrame,
-    edit_orders_view_trans: EditOrdersView,
+    trans: OrderPage,
     tz: ZoneInfo,
     user_id: str,
     has_edit_permission: bool = True,
@@ -46,15 +40,9 @@ def controller(
     session : cambiato.db.Session
         An active database session.
 
-    order_translation : cambiato.translations.Order
+    trans : cambiato.translations.OrderPage
         The translations for the order page.
 
-    db_translation: cambiato.translations.Database
-        Translations for default database objects.
-
-    edit_orders_df_trans : cambiato.translations.EditOrdersDataFrame
-        The translations for the order DataFrame editor component
-        :func:`cambiato.app.components.edit_orders`.
 
     tz : zoneinfo.ZoneInfo
         The timezone where the application is used.
@@ -66,13 +54,14 @@ def controller(
         True if the user has permission to edit orders and False otherwise.
     """
 
-    st.title(order_translation.page_title)
+    if page_title := trans.controller.page_title:
+        st.title(page_title)
 
     utilities = get_all_utilities_cached(
-        _session=session, translation=create_translation_mapping(db_translation.utility)
+        _session=session, translation=create_translation_mapping(trans.db.utility)
     )
 
-    left_col, right_col, _ = st.columns((3, 1, 6))
+    left_col, right_col, _ = st.columns((3, 1, 6), vertical_alignment='center')
     with left_col:
         selected_utility = utility_pills_selector(
             label='Utility', utilities=utilities, default=0, label_visibility='collapsed'
@@ -91,19 +80,19 @@ def controller(
         checklists = ChecklistDataFrameModel()
         create_order_button_disabled = True
 
-    order_type_trans = create_translation_mapping(db_translation.order_type)
+    order_type_trans = create_translation_mapping(trans.db.order_type)
     order_types = get_all_order_types_cached(
         _session=session, utility_ids=utility_ids, translation=order_type_trans
     )
 
-    order_status_trans = create_translation_mapping(db_translation.order_status)
+    order_status_trans = create_translation_mapping(trans.db.order_status)
     order_statuses = get_all_order_statuses_cached(
         _session=session, utility_ids=utility_ids, translation=order_status_trans
     )
 
     with right_col:
         create_order_button(
-            label=order_translation.create_order_button.label,
+            label=trans.create_order_button.label,
             disabled=create_order_button_disabled,
             session=session,
             utility_id=selected_utility,
@@ -112,15 +101,15 @@ def controller(
             facilities=facilities,
             checklists=checklists,
             technicians=technicians,
-            translation=order_translation.create_order_form,
+            translation=trans.create_order_form,
             tz=tz,
             user_id=user_id,
-            help_text=order_translation.create_order_button.help_text,
+            help_text=trans.create_order_button.help_text,
         )
 
     st.divider()
     if not selected_utility:
-        st.info('Please select a utility above!', icon=ICON_INFO)
+        st.info(trans.controller.select_utility_info_message, icon=ICON_INFO)
         return
 
     orders = get_all_orders_cached(
@@ -137,8 +126,8 @@ def controller(
         order_statuses=order_statuses,
         facilities=facilities,
         technicians=technicians,
-        trans=edit_orders_view_trans,
-        edit_orders_df_trans=edit_orders_df_trans,
+        trans=trans.edit_orders_view,
+        edit_orders_df_trans=trans.edit_orders_df,
         tz=tz,
         user_id=user_id,
         has_edit_permission=has_edit_permission,
