@@ -21,6 +21,7 @@ from cambiato.translations.core import (
     translate_dataframe,
 )
 from cambiato.translations.database import Database
+from cambiato.translations.pages import OrderPage, PageTranslationModels
 from cambiato.translations.views import EditOrdersView, Orders, Views
 
 # The Public API
@@ -46,6 +47,9 @@ __all__ = [
     'OrderController',
     # database
     'Database',
+    # pages
+    'OrderPage',
+    'PageTranslationModels',
     # views
     'EditOrdersView',
     'Orders',
