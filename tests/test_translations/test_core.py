@@ -12,8 +12,8 @@ from pandas.testing import assert_frame_equal
 # Local
 from cambiato import exceptions
 from cambiato.config import Language
+from cambiato.translations import PageTranslationModels
 from cambiato.translations.core import (
-    TranslationModel,
     create_translation_mapping,
     load_translation,
     translate_dataframe,
@@ -135,7 +135,7 @@ class TestLoadTranslation:
 
         # Verify
         # ===========================================================
-        assert isinstance(trans, TranslationModel)
+        assert isinstance(trans, PageTranslationModels)
 
         # Clean up - None
         # ===========================================================
