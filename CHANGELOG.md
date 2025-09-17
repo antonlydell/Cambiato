@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.4.1] - 2025-09-17
+
+Bug fix to include the language translations in the built package!
+
+Currently the only supported language is English, but infrastructure exists to add
+more languages further down the road.
+
+
+### Fixed
+
+- The language translation files for the application were not correctly included in the built
+  package, which caused the application to crash on startup. This is now resolved.
+
+
 ## [0.4.0] - 2025-09-17
 
 Create and edit orders on the new order page!
@@ -64,7 +78,8 @@ A first release and declaration of the project.
 - Registration on [PyPI](https://pypi.org/project/Cambiato/0.1.0/).
 
 
-[Unreleased]: https://github.com/antonlydell/Cambiato/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/antonlydell/Cambiato/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/antonlydell/Cambiato/releases/tag/v0.4.1
 [0.4.0]: https://github.com/antonlydell/Cambiato/releases/tag/v0.4.0
 [0.3.0]: https://github.com/antonlydell/Cambiato/releases/tag/v0.3.0
 [0.2.0]: https://github.com/antonlydell/Cambiato/releases/tag/v0.2.0
