@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.4.0] - 2025-09-17
+
+Create and edit orders on the new order page!
+
+The order page allows a user to create orders for selected utility through the create order form.
+The page also lists non-completed orders for selected utility in a table, where it is possible to
+update the orders if the user is permitted to do so. The page serves as an overview of the orders
+that represent the current workload for the technicians. It is possible to see e.g. the most recent
+orders, the assigned technician, the order status and when orders are scheduled at.
+
+This is a first draft of the page and more functionality, like listing completed orders and deleting
+orders, will be added in future releases.
+
+
 ## [0.3.0] - 2025-07-16
 
 Register and sign in!
@@ -50,7 +64,8 @@ A first release and declaration of the project.
 - Registration on [PyPI](https://pypi.org/project/Cambiato/0.1.0/).
 
 
-[Unreleased]: https://github.com/antonlydell/Cambiato/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/antonlydell/Cambiato/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/antonlydell/Cambiato/releases/tag/v0.4.0
 [0.3.0]: https://github.com/antonlydell/Cambiato/releases/tag/v0.3.0
 [0.2.0]: https://github.com/antonlydell/Cambiato/releases/tag/v0.2.0
 [0.1.1]: https://github.com/antonlydell/Cambiato/releases/tag/v0.1.1
