@@ -1,1 +1,1 @@
-recursive-include src/cambiato/app/translations/translations *
+recursive-include src/cambiato/translations/translations *
